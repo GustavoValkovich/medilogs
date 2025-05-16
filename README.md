@@ -1,7 +1,7 @@
 
 # MediLogs
 
-MediLogs Lite is a patient and clinical history management application.
+MediLogs is a patient and clinical history management application.
 
 ## Features
 
