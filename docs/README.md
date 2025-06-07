@@ -97,7 +97,7 @@
 
 - **Descripción:** Crea una nueva entrada de historia clínica para un paciente.
 - **Body (multipart/form-data si hay archivo):**
-
+```
 {
 
 "fecha": "2025-06-05",
@@ -107,7 +107,7 @@
 "adjunto": archivo (opcional: PDF, JPG, PNG)
 
 }
-
+```
 - **Respuestas:**
   - 201 Created
   - 400 Bad Request
@@ -119,7 +119,7 @@
 - **Respuesta:**
 
 \[
-
+```
 {
 
 "id": 1,
@@ -133,7 +133,7 @@
 }
 
 \]
-
+```
 **GET /historias-clinicas/:id**
 
 - **Descripción:** Obtiene los detalles de una historia clínica específica.
@@ -167,7 +167,7 @@
 - **Descripción:** Lista de turnos del PI, agrupados por día (por defecto: día actual).
 - **Query Params:** ?fecha=2025-06-05
 - **Respuesta:**
-
+```
 \[
 
 {
@@ -181,7 +181,7 @@
 }
 
 \]
-
+```
 | Método | Ruta | Descripción | Autenticación |
 | --- | --- | --- | --- |
 | GET | /agenda | Obtener agenda diaria de turnos | ✅   |
