@@ -33,7 +33,7 @@
 
 - **Descripción:** Registra un nuevo paciente.
 - **Body:**
-
+```
 {
 
 "nombre": "Juan Pérez",
@@ -49,6 +49,7 @@
 "advertencia": "Alergia a penicilina"
 
 }
+```
 
 - **Respuestas:**
   - 201 Created
@@ -117,9 +118,9 @@
 
 - **Descripción:** Lista todas las historias clínicas del paciente.
 - **Respuesta:**
-
-\[
 ```
+\[
+
 {
 
 "id": 1,
