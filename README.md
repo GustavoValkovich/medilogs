@@ -51,9 +51,9 @@ MediLogs es un sistema web moderno y profesional para la gestión integral de pa
 ### Prerrequisitos
 - Node.js v18.0.0 o superior
 - npm v8.0.0 o superior
-- PostgreSQL v16.0 o superior
+- Docker y Docker Compose (recomendado) O PostgreSQL v16.0 o superior
 
-### Configuración del Backend
+### Opción 1: Desarrollo con Docker (Recomendado)
 
 ```bash
 # Clonar el repositorio
@@ -64,11 +64,26 @@ cd medilogs
 cd back
 npm install
 
-# Compilar TypeScript
-npm run build
-
-# Iniciar servidor en modo desarrollo
+# Iniciar desarrollo (automáticamente configura Docker)
 npm run dev
+```
+
+El comando `npm run dev` automáticamente:
+- Verifica que Docker esté corriendo
+- Crea e inicia el contenedor PostgreSQL si no existe
+- Espera a que PostgreSQL esté listo
+- Inicia el servidor de desarrollo
+
+### Opción 2: Desarrollo con PostgreSQL Local
+
+```bash
+# Instalar dependencias del backend
+cd back
+npm install
+
+# Configurar PostgreSQL local (ver sección de Base de Datos)
+# Usar el comando de desarrollo local
+npm run dev:local
 ```
 
 ### Configuración de Base de Datos
@@ -304,20 +319,32 @@ CREATE TABLE consulta (
 ```bash
 # Backend - Desarrollo
 cd back
-npm run dev          # Servidor en modo desarrollo con ts-node
-npm run dev:watch    # Servidor con recarga automática
-npm run build        # Compilar TypeScript a JavaScript
-npm run start        # Servidor en modo producción
-npm run type-check   # Verificación de tipos TypeScript
-npm run setup        # Configurar doctor inicial
+
+# Desarrollo con Docker (recomendado)
+npm run dev                  # Verificar/iniciar Docker PostgreSQL y servidor
+npm run dev:docker           # Script avanzado con opciones
+npm run dev:docker:fresh     # Recrear contenedores desde cero
+npm run dev:docker:logs      # Ver logs de PostgreSQL
+npm run dev:docker:status    # Ver estado de contenedores
+npm run dev:docker:stop      # Detener contenedores
+
+# Desarrollo local (sin Docker)
+npm run dev:local            # Usar PostgreSQL local
+npm run dev:watch            # Servidor con recarga automática
+
+# Producción
+npm run build                # Compilar TypeScript a JavaScript
+npm run start                # Servidor en modo producción
+npm run type-check           # Verificación de tipos TypeScript
+npm run setup                # Configurar doctor inicial
 
 # Frontend - Desarrollo  
 cd UI
-npm run start        # Servidor local para desarrollo
-npm run dev          # Servidor con watch mode
-npm run build        # Minificar CSS y JS
-npm run format       # Formatear código con Prettier
-npm run lint         # Linter para JavaScript
+npm run start                # Servidor local para desarrollo
+npm run dev                  # Servidor con watch mode
+npm run build                # Minificar CSS y JS
+npm run format               # Formatear código con Prettier
+npm run lint                 # Linter para JavaScript
 ```
 
 ### Estructura de Desarrollo
@@ -412,6 +439,26 @@ docker-compose up -d
 # O construir imagen manualmente
 docker build -t medilogs .
 docker run -p 3000:3000 medilogs
+```
+
+### Comandos Docker Útiles
+```bash
+# Ver estado de contenedores
+npm run dev:docker:status
+
+# Ver logs de PostgreSQL
+npm run dev:docker:logs
+
+# Recrear contenedores desde cero
+npm run dev:docker:fresh
+
+# Detener todos los contenedores
+npm run dev:docker:stop
+
+# Comandos Docker directos
+docker-compose up -d postgres    # Solo PostgreSQL
+docker-compose down              # Detener todo
+docker-compose logs postgres     # Ver logs
 ```
 
 ## Testing y Calidad

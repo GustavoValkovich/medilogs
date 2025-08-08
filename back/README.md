@@ -1,4 +1,4 @@
-# 🏥 MediLogs v3.0.0
+# MediLogs Backend v3.0.0
 
 **Sistema de gestión médica optimizado** con arquitectura modular, seguridad avanzada y manejo de archivos.
 
@@ -6,15 +6,67 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue)
 ![Express](https://img.shields.io/badge/Express-4.x-black)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16%2B-blue)
-![SQLite](https://img.shields.io/badge/SQLite-3.x-lightgrey)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 
-## 📋 Descripción
+## Descripción
 
-MediLogs es un sistema backend completo para la gestión de historias clínicas, desarrollado con **Node.js** y **TypeScript**. Implementa una **arquitectura modular** con seguridad avanzada, upload de archivos, y soporte para múltiples bases de datos.
+MediLogs es un sistema backend completo para la gestión de historias clínicas, desarrollado con **Node.js** y **TypeScript**. Implementa una **arquitectura modular** con seguridad avanzada, upload de archivos, y soporte para Docker.
 
-## ✨ Características Principales
+## Scripts de Desarrollo
 
-### 🏗️ **Arquitectura Modular**
+### Desarrollo con Docker (Recomendado)
+
+```bash
+# Iniciar desarrollo con verificación automática de Docker
+npm run dev
+```
+
+Este comando ejecuta `./scripts/dev-with-docker.sh` que:
+1. Verifica que Docker esté corriendo
+2. Crea/inicia el contenedor PostgreSQL si es necesario
+3. Espera a que PostgreSQL esté listo
+4. Configura las variables de entorno
+5. Inicia el servidor de desarrollo
+
+### Scripts Docker Avanzados
+
+```bash
+# Script avanzado con opciones
+npm run dev:docker
+
+# Opciones disponibles:
+npm run dev:docker:fresh     # Recrear contenedores desde cero
+npm run dev:docker:logs      # Ver logs de PostgreSQL
+npm run dev:docker:status    # Ver estado de contenedores
+npm run dev:docker:stop      # Detener contenedores
+```
+
+### Desarrollo Local
+
+```bash
+# Usar PostgreSQL local (instalado con Homebrew)
+npm run dev:local
+
+# Con recarga automática
+npm run dev:watch
+```
+
+### Producción
+
+```bash
+# Compilar TypeScript
+npm run build
+
+# Iniciar en producción
+npm run start
+
+# Con PM2
+npm run start:prod
+```
+
+## Características Principales
+
+### Arquitectura Modular
 - **Estructura modular** organizada por dominios (patients, consultations, doctors, files, auth)
 - **Separación clara** entre controladores, repositorios y rutas
 - **Middleware compartido** para validaciones, logging y manejo de errores
