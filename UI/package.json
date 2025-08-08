@@ -1,0 +1,53 @@
+{
+  "name": "medilogs-ui",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de pacientes médicos con interfaz moderna en Bootstrap 5",
+  "main": "index.html",
+  "scripts": {
+    "start": "live-server --port=3000 --host=localhost",
+    "dev": "live-server --port=3000 --host=localhost --watch=assets/css,assets/js",
+    "build": "npm run minify-css && npm run minify-js",
+    "minify-css": "cleancss -o assets/css/styles.min.css assets/css/styles.css",
+    "minify-js": "uglifyjs assets/js/script.js -o assets/js/script.min.js",
+    "lint": "eslint assets/js/*.js",
+    "format": "prettier --write \"**/*.{html,css,js,json}\"",
+    "validate": "html-validate index.html"
+  },
+  "keywords": [
+    "medical",
+    "patient-management",
+    "healthcare",
+    "bootstrap",
+    "frontend",
+    "ui",
+    "medilogs"
+  ],
+  "author": "Gustavo Valkovich",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gustavovalkovich/medilogs_UI.git"
+  },
+  "bugs": {
+    "url": "https://github.com/gustavovalkovich/medilogs_UI/issues"
+  },
+  "homepage": "https://github.com/gustavovalkovich/medilogs_UI#readme",
+  "devDependencies": {
+    "clean-css-cli": "^5.6.2",
+    "eslint": "^8.55.0",
+    "html-validate": "^8.7.4",
+    "live-server": "^1.2.2",
+    "prettier": "^3.1.1",
+    "uglify-js": "^3.17.4"
+  },
+  "dependencies": {},
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}

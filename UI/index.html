@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLogs - Gestión de Pacientes</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link href="assets/css/styles.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-content">
+                    <!-- Botón Persona con Dropdown -->
+                    <div class="sidebar-btn">
+                        <div class="dropdown">
+                            <button class="btn btn-circle btn-primary dropdown-toggle" data-bs-toggle="dropdown" 
+                                id="profileDropdown" aria-expanded="false">
+                                <i class="bi bi-person"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown" style="min-width: 160px;">
+                                <li>
+                                    <h6 class="dropdown-header">
+                                        <i class="bi bi-person-circle me-2"></i>Perfil
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="#" onclick="logout()">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Botón Círculo Mitad Gris/Blanco -->
+                    <div class="sidebar-btn">
+                        <button class="btn btn-circle btn-dual" data-bs-toggle="tooltip" data-bs-placement="right"
+                            title="Negatoscopio" id="negatoscopeBtn" onclick="showNegatoscope()">
+                            <div class="dual-circle"></div>
+                        </button>
+                    </div>
+
+                    <!-- Botón Configuración con Dropdown -->
+                    <div class="sidebar-btn">
+                        <div class="dropdown">
+                            <button class="btn btn-circle btn-secondary dropdown-toggle" data-bs-toggle="dropdown" 
+                                id="configDropdown" aria-expanded="false">
+                                <i class="bi bi-gear"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="configDropdown" style="min-width: 180px;">
+                                <li>
+                                    <h6 class="dropdown-header">
+                                        <i class="bi bi-gear-fill me-2"></i>Configuración
+                                    </h6>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="toggleDarkMode()" id="darkModeToggle">
+                                        <i class="bi bi-moon me-2" id="darkModeIcon"></i>
+                                        <span id="darkModeText">Modo Oscuro</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="showAppInfo()">
+                                        <i class="bi bi-info-circle me-2"></i>Acerca de MediLogs
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Tarjeta Principal - Gestión de Pacientes -->
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="card-title mb-1">Gestión de Pacientes</h4>
+                        <p class="card-subtitle mb-0 text-light">Ver, buscar, editar o crear pacientes. Haga clic en una
+                            fila para editar.</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- Contador de pacientes -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h6 class="text-muted mb-0">
+                                    <span id="patientsCount">Cargando pacientes...</span>
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <!-- Barra de búsqueda y botón agregar -->
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="flex-fill me-3">
+                                <div class="input-group" style="max-width: 500px;">
+                                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                    <input type="text" class="form-control"
+                                        placeholder="Buscar: nombre, DNI, edad, sexo, localidad, obra social..."
+                                        id="searchInput">
+                                    <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn" style="display: none;" title="Limpiar búsqueda">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" type="button" id="searchHelpBtn" title="Ayuda de búsqueda">
+                                        <i class="bi bi-question-circle"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-success" id="addPatientBtn">
+                                    <i class="bi bi-person-plus"></i> Agregar paciente
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Tabla de pacientes con scroll (3 filas visibles) -->
+                        <div class="table-container" style="height: 180px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 0.375rem;">
+                            <table class="table table-striped table-hover patients-table mb-0">
+                                <thead class="patients-table-header" style="position: sticky; top: 0; background-color: #f8f9fa; z-index: 100; border-bottom: 2px solid #dee2e6;">
+                                    <tr>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">ID</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">Nombre</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">NACIMIENTO</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">Edad</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">Sexo</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">DNI</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">Localidad</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">OB. SOC.</th>
+                                        <th style="font-size: 0.875rem; padding: 0.5rem; background-color: #f8f9fa;">Historias</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patientsTableBody" class="patients-table-body">
+                                    <!-- Los datos se cargarán dinámicamente desde la API -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección inferior con Calendario y Entradas -->
+                <div class="row g-4">
+                    <!-- Calendario -->
+                    <div class="col-lg-5 col-md-6">
+                        <div class="card calendar-card">
+                            <div class="card-body p-0">
+                                <div class="calendar-container">
+                                    <div class="calendar-header d-flex justify-content-between align-items-center mb-3">
+                                        <button class="btn calendar-nav-btn" id="prevMonth" type="button" onclick="changeMonth(-1)">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
+                                        <h6 id="currentMonthYear" class="mb-0 fw-bold"></h6>
+                                        <button class="btn calendar-nav-btn" id="nextMonth" type="button" onclick="changeMonth(1)">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="calendar-grid">
+                                        <div class="calendar-weekdays">
+                                            <div class="weekday">Dom</div>
+                                            <div class="weekday">Lun</div>
+                                            <div class="weekday">Mar</div>
+                                            <div class="weekday">Mié</div>
+                                            <div class="weekday">Jue</div>
+                                            <div class="weekday">Vie</div>
+                                            <div class="weekday">Sáb</div>
+                                        </div>
+                                        <div class="calendar-days" id="calendarDays">
+                                            <!-- Días generados dinámicamente -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Entradas del día -->
+                    <div class="col-lg-7 col-md-6">
+                        <div class="card calendar-entries-card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between">
+                                <h6 class="card-title mb-0 d-flex align-items-center">
+                                    <i class="bi bi-journal-text me-2"></i>
+                                    <span>Entradas del día</span>
+                                </h6>
+                                <h6 id="selectedDate" class="mb-0 text-muted fw-normal">Hoy</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="dailyEntries" class="h-100">
+                                    <!-- Las entradas se cargarán dinámicamente -->
+                                    <div class="d-flex flex-column align-items-center justify-content-center h-100 text-center py-5">
+                                        <div class="spinner-border text-primary mb-3" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                        <p class="text-muted mb-0">Cargando entradas del día...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ayuda de Búsqueda -->
+    <div class="modal fade" id="searchHelpModal" tabindex="-1" aria-labelledby="searchHelpModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-info text-white">
+                    <h5 class="modal-title" id="searchHelpModalLabel">
+                        <i class="bi bi-search me-2"></i>Guía de Búsqueda Avanzada
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary"><i class="bi bi-1-circle me-2"></i>Búsqueda Simple</h6>
+                            <p class="text-muted">Escriba cualquier término para buscar en todos los campos:</p>
+                            <ul class="list-unstyled">
+                                <li><code>Juan</code> - Busca "Juan" en nombre</li>
+                                <li><code>12345678</code> - Busca en DNI</li>
+                                <li><code>OSDE</code> - Busca en obra social</li>
+                                <li><code>Buenos Aires</code> - Busca en localidad</li>
+                            </ul>
+
+                            <h6 class="text-success mt-4"><i class="bi bi-2-circle me-2"></i>Búsqueda por Edad</h6>
+                            <ul class="list-unstyled">
+                                <li><code>25</code> - Pacientes de 25 años</li>
+                                <li><code>30 años</code> - Pacientes de 30 años</li>
+                                <li><code>niño</code> - Menores de 12 años</li>
+                                <li><code>adolescente</code> - 13-17 años</li>
+                                <li><code>joven</code> - 18-30 años</li>
+                                <li><code>adulto</code> - 31-60 años</li>
+                                <li><code>mayor</code> - Más de 61 años</li>
+                            </ul>
+
+                            <h6 class="text-warning mt-4"><i class="bi bi-3-circle me-2"></i>Búsqueda por Sexo</h6>
+                            <ul class="list-unstyled">
+                                <li><code>masculino</code> - Pacientes masculinos</li>
+                                <li><code>femenino</code> - Pacientes femeninos</li>
+                                <li><code>hombre</code> - Pacientes masculinos</li>
+                                <li><code>mujer</code> - Pacientes femeninos</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-danger"><i class="bi bi-plus-circle me-2"></i>Búsqueda Combinada</h6>
+                            <p class="text-muted">Use el símbolo <strong>+</strong> para combinar criterios:</p>
+                            
+                            <div class="alert alert-light">
+                                <h6>Ejemplos prácticos:</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-2">
+                                        <code>juan+25</code><br>
+                                        <small class="text-muted">Pacientes llamados Juan de 25 años</small>
+                                    </li>
+                                    <li class="mb-2">
+                                        <code>femenino+30+OSDE</code><br>
+                                        <small class="text-muted">Mujeres de 30 años con OSDE</small>
+                                    </li>
+                                    <li class="mb-2">
+                                        <code>masculino+adolescente</code><br>
+                                        <small class="text-muted">Hombres adolescentes (13-17 años)</small>
+                                    </li>
+                                    <li class="mb-2">
+                                        <code>Buenos Aires+mayor+diabetes</code><br>
+                                        <small class="text-muted">Adultos mayores de Buenos Aires con diabetes</small>
+                                    </li>
+                                    <li class="mb-2">
+                                        <code>garcia+joven+mujer</code><br>
+                                        <small class="text-muted">Mujeres jóvenes con apellido García</small>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <h6><i class="bi bi-lightbulb me-2"></i>Consejos:</h6>
+                                <ul class="mb-0">
+                                    <li>No hay límite en la cantidad de criterios</li>
+                                    <li>La búsqueda no distingue mayúsculas/minúsculas</li>
+                                    <li>Se busca en todos los campos incluyendo información importante</li>
+                                    <li>Use términos específicos para mejores resultados</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal del Negatoscopio -->
+    <div class="negatoscope-modal" id="negatoscopeModal" onclick="hideNegatoscope()" style="display: none;">
+        <div class="negatoscope-content">
+            <!-- Texto de instrucciones -->
+            <div class="negatoscope-instructions">
+                Toca en cualquier parte de la pantalla para cerrar
+            </div>
+            <!-- Contenido completamente blanco -->
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Funciones simples para negatoscopio -->
+    <script>
+        // Función para el negatoscopio
+        function showNegatoscope() {
+            console.log('Mostrando negatoscopio...');
+            const modal = document.getElementById('negatoscopeModal');
+            if (modal) {
+                modal.style.display = 'block';
+                modal.style.opacity = '1';
+                document.body.style.overflow = 'hidden';
+                console.log('Negatoscopio mostrado');
+            } else {
+                console.log('Error: No se encontró el modal del negatoscopio');
+            }
+        }
+
+        function hideNegatoscope() {
+            console.log('Ocultando negatoscopio...');
+            const modal = document.getElementById('negatoscopeModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.style.opacity = '0';
+                document.body.style.overflow = '';
+                console.log('Negatoscopio ocultado');
+            }
+        }
+
+        // Función para cerrar sesión
+        function logout() {
+            // Mostrar modal personalizado en lugar del confirm nativo
+            showLogoutConfirmModal();
+        }
+
+        // Funciones para modo oscuro
+        function toggleDarkMode() {
+            const body = document.body;
+            const isDarkMode = body.classList.contains('dark-mode');
+            
+            if (isDarkMode) {
+                // Cambiar a modo claro
+                body.classList.remove('dark-mode');
+                localStorage.setItem('medilogs_dark_mode', 'false');
+                updateDarkModeUI(false);
+            } else {
+                // Cambiar a modo oscuro
+                body.classList.add('dark-mode');
+                localStorage.setItem('medilogs_dark_mode', 'true');
+                updateDarkModeUI(true);
+            }
+        }
+
+        function updateDarkModeUI(isDark) {
+            const icon = document.getElementById('darkModeIcon');
+            const text = document.getElementById('darkModeText');
+            
+            if (isDark) {
+                icon.className = 'bi bi-sun me-2';
+                text.textContent = 'Modo Claro';
+            } else {
+                icon.className = 'bi bi-moon me-2';
+                text.textContent = 'Modo Oscuro';
+            }
+        }
+
+        function initializeDarkMode() {
+            const savedMode = localStorage.getItem('medilogs_dark_mode');
+            const isDarkMode = savedMode === 'true';
+            
+            if (isDarkMode) {
+                document.body.classList.add('dark-mode');
+            }
+            
+            updateDarkModeUI(isDarkMode);
+        }
+
+        function showAppInfo() {
+            const modalHtml = `
+                <div class="modal fade" id="appInfoModal" tabindex="-1" aria-labelledby="appInfoModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title" id="appInfoModalLabel">
+                                    <i class="bi bi-heart-pulse me-2"></i>Acerca de MediLogs
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center py-4">
+                                <div class="mb-3">
+                                    <i class="bi bi-heart-pulse text-primary" style="font-size: 4rem;"></i>
+                                </div>
+                                <h4 class="text-primary mb-3">MediLogs</h4>
+                                <p class="text-muted mb-3">Sistema de Gestión de Pacientes</p>
+                                <div class="row text-start">
+                                    <div class="col-6">
+                                        <small class="text-muted">Versión:</small><br>
+                                        <strong>1.0.0</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted">Desarrollado:</small><br>
+                                        <strong>2025</strong>
+                                    </div>
+                                </div>
+                                <hr>
+                                <p class="small text-muted mb-0">
+                                    <i class="bi bi-shield-check me-1"></i>
+                                    Datos seguros y confidenciales
+                                </p>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar modal al body si no existe
+            if (!document.getElementById('appInfoModal')) {
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            }
+            
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('appInfoModal'));
+            modal.show();
+            
+            // Limpiar el modal del DOM cuando se cierre
+            document.getElementById('appInfoModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        // Inicializar modo oscuro al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDarkMode();
+        });
+
+        // Función para mostrar modal de confirmación personalizado
+        function showLogoutConfirmModal() {
+            const modalHtml = `
+                <div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title" id="logoutConfirmModalLabel">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Confirmar Cierre de Sesión
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-center py-4">
+                                <i class="bi bi-box-arrow-right text-danger" style="font-size: 3rem;"></i>
+                                <h6 class="mt-3 mb-3">¿Está seguro que desea cerrar sesión?</h6>
+                                <p class="text-muted mb-0">Se perderán los datos no guardados y deberá iniciar sesión nuevamente.</p>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <button type="button" class="btn btn-secondary me-3" data-bs-dismiss="modal">
+                                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="performLogout()">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Cerrar Sesión
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Agregar modal al body si no existe
+            if (!document.getElementById('logoutConfirmModal')) {
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            }
+            
+            // Mostrar el modal
+            const modal = new bootstrap.Modal(document.getElementById('logoutConfirmModal'));
+            modal.show();
+            
+            // Limpiar el modal del DOM cuando se cierre
+            document.getElementById('logoutConfirmModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+        // Función que realmente ejecuta el logout
+        function performLogout() {
+            // Limpiar datos del localStorage si existen
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            localStorage.removeItem('userSession');
+            
+            // Limpiar datos del sessionStorage si existen
+            sessionStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('userSession');
+            
+            // Redirigir a la página de login
+            window.location.href = 'login.html';
+        }
+    </script>
+
+    <!-- API Configuration -->
+    <script src="config.js"></script>
+    
+    <!-- API Client -->
+    <script src="assets/js/api.js"></script>
+
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+
+</html>

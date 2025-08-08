@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLogs - Iniciar Sesión</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #32495d 0%, #2b3f50 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 600px;
+        }
+
+        .login-left {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .login-right {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .logo i {
+            margin-right: 1rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            height: auto;
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            border: none;
+            background: none;
+            color: #6c757d;
+            cursor: pointer;
+            z-index: 10;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .password-toggle:hover {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        .password-toggle:focus {
+            outline: none;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+            border-radius: 10px;
+            padding: 1rem;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.3);
+        }
+
+        .btn-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .btn-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .btn-google {
+            background: #db4437;
+            border: none;
+            border-radius: 10px;
+            padding: 1rem;
+            color: white;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .btn-google:hover {
+            background: #c23321;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(219, 68, 55, 0.3);
+            color: white;
+        }
+
+        .divider {
+            position: relative;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #dee2e6, transparent);
+        }
+
+        .divider span {
+            background: rgba(244, 245, 246, 0.95);
+            padding: 0 1.5rem;
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .forgot-password {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .spinner-border-sm {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .alert {
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                margin: 1rem;
+                min-height: auto;
+            }
+
+            .login-left {
+                padding: 2rem;
+            }
+
+            .login-right {
+                padding: 2rem;
+            }
+
+            .logo {
+                font-size: 2.5rem;
+            }
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .feature-item i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12">
+                <div class="login-container row g-0">
+                    <!-- Panel Izquierdo -->
+                    <div class="col-lg-6 login-left">
+                        <div>
+                            <div class="logo">
+                                <i class="bi bi-hospital"></i>
+                                MediLogs
+                            </div>
+                            <h3 class="mb-4">Sistema de Gestión Médica</h3>
+                            <p class="mb-4">Plataforma profesional para la gestión integral de pacientes, consultas y archivos médicos.</p>
+                            
+                            <div class="feature-item">
+                                <i class="bi bi-people"></i>
+                                <span>Gestión completa de pacientes</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-calendar-check"></i>
+                                <span>Historial médico detallado</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-file-medical"></i>
+                                <span>Archivos y documentos</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="bi bi-shield-check"></i>
+                                <span>Seguridad y privacidad</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Derecho - Formulario -->
+                    <div class="col-lg-6 login-right">
+                        <div>
+                            <h2 class="text-center mb-4">
+                                <i class="bi bi-person-circle text-primary me-2"></i>
+                                Iniciar Sesión
+                            </h2>
+
+                            <!-- Alertas -->
+                            <div id="alertContainer"></div>
+
+                            <!-- Formulario de Login -->
+                            <form id="loginForm">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="username" placeholder="Email" required>
+                                    <label for="username">
+                                        <i class="bi bi-envelope me-2"></i>Email
+                                    </label>
+                                </div>
+
+                                <div class="form-floating">
+                                    <input type="password" class="form-control" id="password" placeholder="Contraseña">
+                                    <label for="password">
+                                        <i class="bi bi-lock me-2"></i>Contraseña
+                                    </label>
+                                    <button type="button" class="password-toggle" id="togglePassword">
+                                        <i class="bi bi-eye" id="togglePasswordIcon"></i>
+                                    </button>
+                                </div>
+
+                                <div class="d-flex justify-content-start align-items-center mb-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                                        <label class="form-check-label" for="rememberMe">
+                                            Recordarme
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary w-100" id="loginBtn">
+                                    <span class="btn-text">
+                                        <i class="bi bi-box-arrow-in-right me-2"></i>
+                                        Iniciar Sesión
+                                    </span>
+                                    <span class="spinner-border spinner-border-sm d-none" id="loginSpinner"></span>
+                                </button>
+                            </form>
+
+                            <!-- Divider -->
+                            <div class="divider">
+                                <span>O continúa con</span>
+                            </div>
+
+                            <!-- Google Sign In -->
+                            <button type="button" class="btn btn-google w-100" id="googleSignInBtn">
+                                <i class="bi bi-google me-2"></i>
+                                Continuar con Google
+                            </button>
+
+                            <!-- Información adicional -->
+                            <div class="text-center mt-4">
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-info-circle me-1"></i>
+                                        ¿No tienes una cuenta?
+                                    </small>
+                                    <button type="button" class="btn btn-link p-0 ms-2" onclick="openRegisterModal()">
+                                        <i class="bi bi-person-plus me-1"></i>
+                                        Crear cuenta nueva
+                                    </button>
+                                </div>
+                                <div class="mb-3">
+                                    <small class="text-muted">
+                                        <i class="bi bi-key me-1"></i>
+                                        ¿Olvidaste tu contraseña o usuario?
+                                    </small>
+                                    <button type="button" class="btn btn-link p-0 ms-2" data-bs-toggle="modal" data-bs-target="#recoverModal">
+                                        <i class="bi bi-arrow-clockwise me-1"></i>
+                                        Recuperar acceso
+                                    </button>
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-shield-check me-1"></i>
+                                    Para soporte técnico contacta al administrador
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div class="modal fade" id="registerModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-plus text-primary me-2"></i>
+                        Crear Nueva Cuenta
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Importante:</strong> Necesitas una clave de autorización para crear una cuenta nueva.
+                    </div>
+
+                    <form id="registerForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="registerNombre" placeholder="Nombre" required>
+                                    <label for="registerNombre">Nombre</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="registerApellido" placeholder="Apellido" required>
+                                    <label for="registerApellido">Apellido</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="registerEmail" placeholder="Email" required>
+                            <label for="registerEmail">Email</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Contraseña" required>
+                            <label for="registerPassword">Contraseña</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="registerEspecialidad" placeholder="Especialidad" required>
+                            <label for="registerEspecialidad">Especialidad</label>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="tel" class="form-control" id="registerTelefono" placeholder="Teléfono">
+                                    <label for="registerTelefono">Teléfono</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" id="registerMatricula" placeholder="Matrícula">
+                                    <label for="registerMatricula">Matrícula</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="registerAuthKey" placeholder="Clave de autorización" required>
+                            <label for="registerAuthKey">Clave de autorización</label>
+                        </div>
+
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <small>La clave de autorización es proporcionada por el administrador del sistema.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" id="registerBtn">
+                            <span class="btn-text">
+                                <i class="bi bi-person-check me-2"></i>
+                                Crear Cuenta
+                            </span>
+                            <span class="spinner-border spinner-border-sm d-none" id="registerSpinner"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recuperación -->
+    <div class="modal fade" id="recoverModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-question-circle text-primary me-2"></i>
+                        Recuperar Acceso
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-question-circle-fill text-primary" style="font-size: 3rem;"></i>
+                        <h6 class="mt-3">Recuperar tu acceso</h6>
+                        <p class="text-muted">Selecciona una opción para recuperar tu acceso o contacta a soporte:</p>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="mb-3">
+                                <i class="bi bi-tools me-2 text-primary"></i>
+                                Opciones de Recuperación
+                            </h6>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-outline-info" onclick="openRecoverUserModal()">
+                                    <i class="bi bi-person-question me-2"></i>
+                                    Recuperar Usuario
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="openResetPasswordModal()">
+                                    <i class="bi bi-key-fill me-2"></i>
+                                    Cambiar Contraseña
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-light rounded">
+                        <h6 class="mb-3">
+                            <i class="bi bi-telephone me-2 text-primary"></i>
+                            Información de Contacto
+                        </h6>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <strong>Email:</strong> 
+                                <a href="mailto:soporte@medilogs.com" class="text-primary">soporte@medilogs.com</a>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <strong>Teléfono:</strong> 
+                                <span class="text-primary">+54 351 6844989</span>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <strong>Horario:</strong> 
+                                <span class="text-muted">Lunes a Viernes 9:00 - 18:00</span>
+                            </div>
+                            <div class="col-12">
+                                <strong>Tiempo de respuesta:</strong> 
+                                <span class="text-success">1 hora máximo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-success bg-opacity-10 rounded border border-success border-opacity-25">
+                        <h6 class="text-success">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Importante
+                        </h6>
+                        <p class="small mb-2">
+                            <strong>Recuperación de datos:</strong> Necesitas una clave de autorización proporcionada por el administrador del sistema.
+                        </p>
+                        <p class="small mb-0">
+                            <strong>Contacto directo:</strong> Si no tienes la clave, contacta a soporte técnico.
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-2"></i>
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recuperar Usuario -->
+    <div class="modal fade" id="recoverUserModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-person-question text-info me-2"></i>
+                        Recuperar Usuario
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Información:</strong> Necesitas una clave de autorización para recuperar datos de usuario.
+                    </div>
+
+                    <form id="recoverUserForm">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="recoverUserEmail" placeholder="Email" required>
+                            <label for="recoverUserEmail">Email del usuario</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="recoverUserAuthKey" placeholder="Clave de autorización" required>
+                            <label for="recoverUserAuthKey">Clave de autorización</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-info w-100" id="recoverUserBtn">
+                            <span class="btn-text">
+                                <i class="bi bi-search me-2"></i>
+                                Recuperar Datos
+                            </span>
+                            <span class="spinner-border spinner-border-sm d-none" id="recoverUserSpinner"></span>
+                        </button>
+                    </form>
+
+                    <div id="recoverUserResult" class="mt-3 d-none">
+                        <div class="alert alert-success" role="alert">
+                            <h6><i class="bi bi-check-circle me-2"></i>Datos encontrados:</h6>
+                            <div id="recoverUserData"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cambiar Contraseña -->
+    <div class="modal fade" id="resetPasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-key-fill text-danger me-2"></i>
+                        Cambiar Contraseña
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        <strong>Importante:</strong> Necesitas una clave de autorización para cambiar la contraseña.
+                    </div>
+
+                    <form id="resetPasswordForm">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="resetPasswordEmail" placeholder="Email" required>
+                            <label for="resetPasswordEmail">Email del usuario</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="resetPasswordNew" placeholder="Nueva contraseña" required>
+                            <label for="resetPasswordNew">Nueva contraseña</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="resetPasswordConfirm" placeholder="Confirmar contraseña" required>
+                            <label for="resetPasswordConfirm">Confirmar contraseña</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="resetPasswordAuthKey" placeholder="Clave de autorización" required>
+                            <label for="resetPasswordAuthKey">Clave de autorización</label>
+                        </div>
+
+                        <button type="submit" class="btn btn-danger w-100" id="resetPasswordBtn">
+                            <span class="btn-text">
+                                <i class="bi bi-key me-2"></i>
+                                Cambiar Contraseña
+                            </span>
+                            <span class="spinner-border spinner-border-sm d-none" id="resetPasswordSpinner"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Recuperar Contraseña -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 15px;">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-key text-primary me-2"></i>
+                        Recuperar Acceso
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-envelope-exclamation text-warning" style="font-size: 3rem;"></i>
+                        <h6 class="mt-3">¿Problemas para acceder?</h6>
+                        <p class="text-muted">Selecciona una opción para recuperar tu acceso:</p>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-outline-primary" onclick="openRecoverUserModal()">
+                            <i class="bi bi-envelope-question me-2"></i>
+                            Recuperar Usuario
+                        </button>
+                        <button type="button" class="btn btn-outline-danger" onclick="openResetPasswordModal()">
+                            <i class="bi bi-lock-exclamation me-2"></i>
+                            Cambiar Contraseña
+                        </button>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-light rounded">
+                        <h6><i class="bi bi-telephone me-2"></i>Contacto de Soporte</h6>
+                        <p class="mb-2"><strong>Email:</strong> soporte@medilogs.com</p>
+                        <p class="mb-2"><strong>Teléfono:</strong> +54 351 6844989</p>
+                        <p class="mb-0"><strong>Horario:</strong> Lun-Vie 9:00-18:00</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Login JavaScript Embebido -->
+    <script>
+        console.log('🚀 [LOGIN-FIXED] Inicializando login reparado...');
+        
+        // Configuración de la API
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Función para mostrar alertas
+        function showAlert(message, type = 'danger') {
+            console.log(`📢 [ALERT] ${type.toUpperCase()}: ${message}`);
+            
+            const alertContainer = document.getElementById('alertContainer');
+            if (!alertContainer) {
+                console.error('❌ No se encontró el contenedor de alertas');
+                alert(message); // Fallback a alert nativo
+                return;
+            }
+            
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            // Limpiar alertas anteriores
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alertDiv);
+            
+            // Auto-dismiss después de 5 segundos
+            setTimeout(() => {
+                if (alertDiv && alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
+        
+        // Función para manejar el login - SOLO EMAILS VÁLIDOS
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            console.log('🔐 [LOGIN-EMAIL-ONLY] Iniciando proceso de login...');
+            
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            console.log('📝 [LOGIN-EMAIL-ONLY] Datos del formulario:', { email, password: password ? '[HIDDEN]' : 'EMPTY' });
+            
+            if (!email || !password) {
+                showAlert('Por favor completa todos los campos', 'warning');
+                return;
+            }
+            
+            // Validar que sea un email válido
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showAlert('Por favor, ingrese un email válido (ejemplo: usuario@dominio.com)', 'warning');
+                return;
+            }
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const btnText = loginBtn.querySelector('.btn-text');
+            const btnSpinner = document.getElementById('loginSpinner');
+            
+            // Mostrar loading
+            loginBtn.disabled = true;
+            btnText.textContent = 'Iniciando sesión...';
+            btnSpinner.classList.remove('d-none');
+            
+            try {
+                console.log('📧 [LOGIN-EMAIL-ONLY] Intentando login con email:', { email, password: password ? '[HIDDEN]' : 'EMPTY' });
+                
+                const requestBody = {
+                    email: email,
+                    password: password
+                };
+                
+                console.log('🌐 [LOGIN-FIXED] Enviando request a:', `${API_BASE_URL}/auth/login`);
+                console.log('📦 [LOGIN-FIXED] Request body:', { ...requestBody, password: '[HIDDEN]' });
+                
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                console.log('📡 [LOGIN-FIXED] Respuesta del servidor:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok
+                });
+                
+                const responseText = await response.text();
+                console.log('� [LOGIN-FIXED] Respuesta cruda:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                    console.log('✅ [LOGIN-FIXED] Respuesta parseada:', data);
+                } catch (parseError) {
+                    console.error('❌ [LOGIN-FIXED] Error parsing JSON:', parseError);
+                    throw new Error('Respuesta del servidor no válida');
+                }
+                
+                if (response.ok && data.success) {
+                    console.log('✅ [LOGIN-FIXED] Login exitoso:', data);
+                    
+                    // Guardar token JWT y datos de usuario en localStorage
+                    if (data.data && data.data.token) {
+                        localStorage.setItem('token', data.data.token);
+                        console.log('🔐 [LOGIN-FIXED] Token JWT guardado');
+                    }
+                    if (data.data && data.data.medico) {
+                        localStorage.setItem('user', JSON.stringify(data.data.medico));
+                        console.log('💾 [LOGIN-FIXED] Usuario guardado en localStorage:', data.data.medico);
+                    }
+                    
+                    showAlert('✅ Login exitoso. Redirigiendo...', 'success');
+                    
+                    // Redireccionar después de 1 segundo
+                    setTimeout(() => {
+                        console.log('🎯 [LOGIN-FIXED] Redirigiendo a dashboard...');
+                        window.location.href = 'index.html';
+                    }, 1000);
+                    
+                } else {
+                    console.error('❌ [LOGIN-FIXED] Error de login:', data);
+                    showAlert(`Error: ${data.message || 'Credenciales incorrectas'}`, 'danger');
+                }
+                
+            } catch (error) {
+                console.error('❌ [LOGIN-FIXED] Error de red:', error);
+                showAlert(`Error de conexión: ${error.message}`, 'danger');
+            } finally {
+                // Restaurar botón
+                loginBtn.disabled = false;
+                btnText.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>Iniciar Sesión';
+                btnSpinner.classList.add('d-none');
+            }
+        }
+        
+        // Función para manejar el toggle de contraseña
+        function setupPasswordToggle() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.getElementById('togglePassword');
+            const toggleIcon = document.getElementById('togglePasswordIcon');
+            
+            if (toggleButton && passwordInput && toggleIcon) {
+                toggleButton.addEventListener('click', function() {
+                    const type = passwordInput.type === 'password' ? 'text' : 'password';
+                    passwordInput.type = type;
+                    
+                    // Cambiar icono
+                    if (type === 'text') {
+                        toggleIcon.classList.remove('bi-eye');
+                        toggleIcon.classList.add('bi-eye-slash');
+                        toggleButton.title = 'Ocultar contraseña';
+                    } else {
+                        toggleIcon.classList.remove('bi-eye-slash');
+                        toggleIcon.classList.add('bi-eye');
+                        toggleButton.title = 'Mostrar contraseña';
+                    }
+                });
+                
+                // Establecer título inicial
+                toggleButton.title = 'Mostrar contraseña';
+            }
+        }
+
+        // Funciones para abrir modales directamente
+        function openRegisterModal() {
+            const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
+            registerModal.show();
+        }
+
+        function openRecoverModal() {
+            const recoverModal = new bootstrap.Modal(document.getElementById('recoverModal'));
+            recoverModal.show();
+        }
+
+        // Funciones para los modales
+        function openRecoverUserModal() {
+            // Cerrar el modal de recuperación si está abierto
+            const recoverModal = document.getElementById('recoverModal');
+            const recoverModalInstance = bootstrap.Modal.getInstance(recoverModal);
+            if (recoverModalInstance) {
+                recoverModalInstance.hide();
+            }
+            
+            // Cerrar el modal de forgot password si está abierto
+            const forgotModal = document.getElementById('forgotPasswordModal');
+            const forgotModalInstance = bootstrap.Modal.getInstance(forgotModal);
+            if (forgotModalInstance) {
+                forgotModalInstance.hide();
+            }
+            
+            setTimeout(() => {
+                const recoverUserModal = new bootstrap.Modal(document.getElementById('recoverUserModal'));
+                recoverUserModal.show();
+            }, 300);
+        }
+
+        function openResetPasswordModal() {
+            // Cerrar el modal de recuperación si está abierto
+            const recoverModal = document.getElementById('recoverModal');
+            const recoverModalInstance = bootstrap.Modal.getInstance(recoverModal);
+            if (recoverModalInstance) {
+                recoverModalInstance.hide();
+            }
+            
+            // Cerrar el modal de forgot password si está abierto
+            const forgotModal = document.getElementById('forgotPasswordModal');
+            const forgotModalInstance = bootstrap.Modal.getInstance(forgotModal);
+            if (forgotModalInstance) {
+                forgotModalInstance.hide();
+            }
+            
+            setTimeout(() => {
+                const resetPasswordModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+                resetPasswordModal.show();
+            }, 300);
+        }
+
+        // Manejar registro de médico
+        async function handleRegister(event) {
+            event.preventDefault();
+            console.log('👨‍⚕️ [REGISTER] Iniciando registro de médico...');
+            
+            const nombre = document.getElementById('registerNombre').value.trim();
+            const apellido = document.getElementById('registerApellido').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const especialidad = document.getElementById('registerEspecialidad').value.trim();
+            const telefono = document.getElementById('registerTelefono').value.trim();
+            const matricula = document.getElementById('registerMatricula').value.trim();
+            const authKey = document.getElementById('registerAuthKey').value.trim();
+            
+            console.log('📝 [REGISTER] Datos:', { nombre, apellido, email, especialidad, authKey: authKey ? '[PROVIDED]' : '[EMPTY]' });
+            
+            if (!nombre || !apellido || !email || !password || !especialidad || !authKey) {
+                console.warn('⚠️ [REGISTER] Campos requeridos incompletos');
+                showAlert('Por favor completa todos los campos requeridos', 'warning');
+                return;
+            }
+            
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showAlert('Por favor, ingrese un email válido', 'warning');
+                return;
+            }
+            
+            // Validar contraseña
+            if (password.length < 6) {
+                showAlert('La contraseña debe tener al menos 6 caracteres', 'warning');
+                return;
+            }
+            
+            const registerBtn = document.getElementById('registerBtn');
+            const btnText = registerBtn.querySelector('.btn-text');
+            const btnSpinner = document.getElementById('registerSpinner');
+            
+            // Mostrar loading
+            registerBtn.disabled = true;
+            btnText.textContent = 'Creando cuenta...';
+            btnSpinner.classList.remove('d-none');
+            
+            try {
+                const requestBody = {
+                    nombre,
+                    apellido,
+                    email,
+                    password,
+                    especialidad,
+                    telefono,
+                    matricula,
+                    authKey
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestBody)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showAlert('✅ Cuenta creada exitosamente. Ya puedes iniciar sesión.', 'success');
+                    
+                    // Cerrar modal
+                    const registerModal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
+                    registerModal.hide();
+                    
+                    // Limpiar formulario
+                    document.getElementById('registerForm').reset();
+                    
+                } else {
+                    showAlert(`Error: ${data.message || 'Error al crear la cuenta'}`, 'danger');
+                }
+                
+            } catch (error) {
+                showAlert(`Error de conexión: ${error.message}`, 'danger');
+            } finally {
+                // Restaurar botón
+                registerBtn.disabled = false;
+                btnText.innerHTML = '<i class="bi bi-person-check me-2"></i>Crear Cuenta';
+                btnSpinner.classList.add('d-none');
+            }
+        }
+
+        // Manejar recuperación de usuario
+        async function handleRecoverUser(event) {
+            event.preventDefault();
+            console.log('🔍 [RECOVER-USER] Iniciando recuperación de usuario...');
+            
+            const email = document.getElementById('recoverUserEmail').value.trim();
+            const authKey = document.getElementById('recoverUserAuthKey').value.trim();
+            
+            console.log('📝 [RECOVER-USER] Datos:', { email, authKey: authKey ? '[PROVIDED]' : '[EMPTY]' });
+            
+            if (!email || !authKey) {
+                console.warn('⚠️ [RECOVER-USER] Campos incompletos');
+                showAlert('Por favor completa todos los campos', 'warning');
+                return;
+            }
+            
+            const recoverUserBtn = document.getElementById('recoverUserBtn');
+            const btnText = recoverUserBtn.querySelector('.btn-text');
+            const btnSpinner = document.getElementById('recoverUserSpinner');
+            
+            // Mostrar loading
+            recoverUserBtn.disabled = true;
+            btnText.textContent = 'Buscando usuario...';
+            btnSpinner.classList.remove('d-none');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/recover-user`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, authKey })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    const medico = data.data.medico;
+                    const resultDiv = document.getElementById('recoverUserResult');
+                    const dataDiv = document.getElementById('recoverUserData');
+                    
+                    dataDiv.innerHTML = `
+                        <p><strong>Nombre:</strong> ${medico.nombre} ${medico.apellido}</p>
+                        <p><strong>Email:</strong> ${medico.email}</p>
+                        <p><strong>Especialidad:</strong> ${medico.especialidad}</p>
+                        ${medico.telefono ? `<p><strong>Teléfono:</strong> ${medico.telefono}</p>` : ''}
+                        ${medico.matricula ? `<p><strong>Matrícula:</strong> ${medico.matricula}</p>` : ''}
+                    `;
+                    
+                    resultDiv.classList.remove('d-none');
+                    
+                } else {
+                    showAlert(`Error: ${data.message || 'Error al recuperar usuario'}`, 'danger');
+                }
+                
+            } catch (error) {
+                showAlert(`Error de conexión: ${error.message}`, 'danger');
+            } finally {
+                // Restaurar botón
+                recoverUserBtn.disabled = false;
+                btnText.innerHTML = '<i class="bi bi-search me-2"></i>Recuperar Datos';
+                btnSpinner.classList.add('d-none');
+            }
+        }
+
+        // Manejar cambio de contraseña
+        async function handleResetPassword(event) {
+            event.preventDefault();
+            console.log('🔑 [RESET-PASSWORD] Iniciando cambio de contraseña...');
+            
+            const email = document.getElementById('resetPasswordEmail').value.trim();
+            const newPassword = document.getElementById('resetPasswordNew').value;
+            const confirmPassword = document.getElementById('resetPasswordConfirm').value;
+            const authKey = document.getElementById('resetPasswordAuthKey').value.trim();
+            
+            console.log('📝 [RESET-PASSWORD] Datos:', { email, authKey: authKey ? '[PROVIDED]' : '[EMPTY]' });
+            
+            if (!email || !newPassword || !confirmPassword || !authKey) {
+                console.warn('⚠️ [RESET-PASSWORD] Campos incompletos');
+                showAlert('Por favor completa todos los campos', 'warning');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showAlert('Las contraseñas no coinciden', 'warning');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showAlert('La contraseña debe tener al menos 6 caracteres', 'warning');
+                return;
+            }
+            
+            const resetBtn = document.getElementById('resetPasswordBtn');
+            const btnText = resetBtn.querySelector('.btn-text');
+            const btnSpinner = document.getElementById('resetPasswordSpinner');
+            
+            // Mostrar loading
+            resetBtn.disabled = true;
+            btnText.textContent = 'Cambiando contraseña...';
+            btnSpinner.classList.remove('d-none');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, newPassword, authKey })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showAlert('✅ Contraseña cambiada exitosamente', 'success');
+                    
+                    // Cerrar modal
+                    const resetModal = bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal'));
+                    resetModal.hide();
+                    
+                    // Limpiar formulario
+                    document.getElementById('resetPasswordForm').reset();
+                    
+                } else {
+                    showAlert(`Error: ${data.message || 'Error al cambiar contraseña'}`, 'danger');
+                }
+                
+            } catch (error) {
+                showAlert(`Error de conexión: ${error.message}`, 'danger');
+            } finally {
+                // Restaurar botón
+                resetBtn.disabled = false;
+                btnText.innerHTML = '<i class="bi bi-key me-2"></i>Cambiar Contraseña';
+                btnSpinner.classList.add('d-none');
+            }
+        }
+
+        // Funciones para el modal de recuperación (mantener compatibilidad)
+        function recoverEmail() {
+            // Llama directamente a la función de recuperar usuario
+            openRecoverUserModal();
+        }
+        
+        function recoverPassword() {
+            // Llama directamente a la función de cambiar contraseña
+            openResetPasswordModal();
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 [LOGIN-FIXED] DOM cargado, configurando eventos...');
+            
+            // Configurar formulario de login
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+                console.log('✅ [LOGIN-FIXED] Event listener de login configurado');
+            }
+            
+            // Configurar toggle de contraseña
+            setupPasswordToggle();
+            
+            // Configurar formulario de registro
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegister);
+                console.log('✅ [LOGIN-FIXED] Event listener de registro configurado');
+            }
+            
+            // Configurar formulario de recuperación de usuario
+            const recoverUserForm = document.getElementById('recoverUserForm');
+            if (recoverUserForm) {
+                recoverUserForm.addEventListener('submit', handleRecoverUser);
+                console.log('✅ [LOGIN-FIXED] Event listener de recuperación de usuario configurado');
+            }
+            
+            // Configurar formulario de cambio de contraseña
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+            if (resetPasswordForm) {
+                resetPasswordForm.addEventListener('submit', handleResetPassword);
+                console.log('✅ [LOGIN-FIXED] Event listener de cambio de contraseña configurado');
+            }
+            
+            // Focus en username
+            const usernameInput = document.getElementById('username');
+            if (usernameInput) {
+                usernameInput.focus();
+            }
+            
+            // Configurar botón de Google (placeholder)
+            const googleBtn = document.getElementById('googleSignInBtn');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', function() {
+                    showAlert('Login con Google no está disponible en este momento', 'info');
+                });
+            }
+            
+            // Limpiar resultados cuando se abren modales
+            document.getElementById('recoverUserModal').addEventListener('show.bs.modal', function () {
+                document.getElementById('recoverUserResult').classList.add('d-none');
+                document.getElementById('recoverUserForm').reset();
+            });
+            
+            document.getElementById('resetPasswordModal').addEventListener('show.bs.modal', function () {
+                document.getElementById('resetPasswordForm').reset();
+            });
+            
+            document.getElementById('registerModal').addEventListener('show.bs.modal', function () {
+                document.getElementById('registerForm').reset();
+            });
+            
+            console.log('✅ [LOGIN-FIXED] Login completamente inicializado');
+        });
+        
+        // Función global para testing
+        window.testLogin = function() {
+            console.log('🧪 [LOGIN-FIXED] Test manual del login');
+            const event = new Event('submit');
+            document.getElementById('loginForm').dispatchEvent(event);
+        };
+        
+        console.log('✅ [LOGIN-FIXED] Login reparado cargado correctamente');
+    </script>
+</body>
+
+</html>

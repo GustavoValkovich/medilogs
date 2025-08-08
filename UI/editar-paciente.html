@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediLogs - Editar Paciente</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #32495d 0%, #2b3f50 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .container-fluid {
+            max-width: 1200px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .card-header {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 20px 20px 0 0 !important;
+            padding: 1.5rem;
+        }
+
+        .form-floating > label {
+            color: #6c757d;
+        }
+
+        .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border: none;
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-danger {
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+        }
+
+        .btn-secondary {
+            border-radius: 10px;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        .form-text {
+            font-size: 0.875rem;
+        }
+
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .patient-info {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h2 class="mb-0">
+                            <i class="bi bi-person-gear me-2"></i>
+                            Editar Paciente
+                        </h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Alert para mensajes -->
+                        <div id="alertContainer"></div>
+
+                        <!-- Información del paciente -->
+                        <div class="patient-info">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">ID del Paciente:</small>
+                                    <div id="patientId" class="fw-bold fs-5">-</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">Fecha de Registro:</small>
+                                    <div id="createdAt" class="fw-bold">-</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulario de paciente -->
+                        <form id="patientForm">
+                            <div class="row">
+                                <!-- Nombre -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="nombre" placeholder="Nombre" required>
+                                        <label for="nombre" class="required-field">
+                                            <i class="bi bi-person me-2"></i>Nombre
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Documento -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="documento" placeholder="Documento" required>
+                                        <label for="documento" class="required-field">
+                                            <i class="bi bi-card-text me-2"></i>Documento (DNI/CI)
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Ingrese el número de documento sin puntos ni espacios</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Fecha de Nacimiento -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <input type="date" class="form-control" id="nacimiento" placeholder="Fecha de Nacimiento" required>
+                                        <label for="nacimiento" class="required-field">
+                                            <i class="bi bi-calendar me-2"></i>Fecha de Nacimiento
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Sexo -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <select class="form-select" id="sexo">
+                                            <option value="">Seleccionar...</option>
+                                            <option value="M">Masculino</option>
+                                            <option value="F">Femenino</option>
+                                        </select>
+                                        <label for="sexo">
+                                            <i class="bi bi-gender-ambiguous me-2"></i>Sexo
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Email -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="mail" placeholder="Email">
+                                        <label for="mail">
+                                            <i class="bi bi-envelope me-2"></i>Email
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Email de contacto del paciente</div>
+                                </div>
+
+                                <!-- Localidad -->
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="localidad" placeholder="Localidad">
+                                        <label for="localidad">
+                                            <i class="bi bi-geo-alt me-2"></i>Localidad
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Ciudad o localidad de residencia (opcional)</div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- Obra Social -->
+                                <div class="col-md-12 mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="obra_social" placeholder="Obra Social">
+                                        <label for="obra_social">
+                                            <i class="bi bi-hospital me-2"></i>Obra Social
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Nombre de la obra social o prepaga</div>
+                                </div>
+                            </div>
+
+                            <!-- Información Importante -->
+                            <div class="mb-4">
+                                <label for="importante" class="form-label">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>Información Importante
+                                </label>
+                                <textarea class="form-control" id="importante" rows="4"></textarea>
+                                <div class="form-text">
+                                    Información médica relevante que debe tenerse siempre en cuenta
+                                </div>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <button type="button" class="btn btn-secondary me-3" id="cancelBtn">
+                                        <i class="bi bi-x-circle me-2"></i>Cancelar
+                                    </button>
+                                    <button type="button" class="btn btn-danger me-3" id="deleteBtn">
+                                        <i class="bi bi-trash me-2"></i>Eliminar
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" id="saveBtn">
+                                        <span class="spinner-border spinner-border-sm me-2 d-none" id="saveSpinner"></span>
+                                        <span class="btn-text">
+                                            <i class="bi bi-check-circle me-2"></i>Guardar Cambios
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Configuración de la API
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Variables globales
+        let currentPatient = null;
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📝 [EDITAR-PACIENTE] Pantalla de editar paciente cargada');
+            
+            // Obtener datos del paciente del localStorage
+            const patientData = localStorage.getItem('editingPatient');
+            
+            if (!patientData) {
+                console.warn('⚠️ No se encontraron datos del paciente, redirigiendo al index');
+                showAlert('No se encontraron datos del paciente para editar.', 'warning');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                return;
+            }
+
+            try {
+                currentPatient = JSON.parse(patientData);
+                console.log('👤 [EDITAR-PACIENTE] Datos del paciente:', currentPatient);
+                
+                // Llenar el formulario con los datos actuales
+                fillForm(currentPatient);
+                
+            } catch (error) {
+                console.error('❌ Error parseando datos del paciente:', error);
+                showAlert('Error al cargar los datos del paciente.', 'danger');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 2000);
+                return;
+            }
+            
+            // Event listeners
+            document.getElementById('patientForm').addEventListener('submit', handleUpdatePatient);
+            document.getElementById('cancelBtn').addEventListener('click', handleCancel);
+            document.getElementById('deleteBtn').addEventListener('click', handleDeletePatient);
+            
+            // Validación en tiempo real del documento
+            document.getElementById('documento').addEventListener('input', validateDocumento);
+        });
+
+        // Función para llenar el formulario
+        function fillForm(patient) {
+            document.getElementById('patientId').textContent = patient.id;
+            document.getElementById('createdAt').textContent = patient.created_at ? 
+                new Date(patient.created_at).toLocaleDateString('es-ES') : 'N/A';
+            
+            document.getElementById('nombre').value = patient.nombre || '';
+            document.getElementById('documento').value = patient.documento || '';
+            document.getElementById('nacimiento').value = patient.nacimiento ? 
+                patient.nacimiento.split('T')[0] : '';
+            document.getElementById('sexo').value = patient.sexo || '';
+            document.getElementById('mail').value = patient.mail || '';
+            document.getElementById('localidad').value = patient.localidad || '';
+            document.getElementById('obra_social').value = patient.obra_social || '';
+            document.getElementById('importante').value = patient.importante || '';
+        }
+
+        // Función para mostrar alertas
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+            
+            const alertHTML = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert" id="${alertId}">
+                    <i class="bi bi-${getAlertIcon(type)} me-2"></i>
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            alertContainer.innerHTML = alertHTML;
+            
+            // Auto-hide después de 5 segundos
+            setTimeout(() => {
+                const alert = document.getElementById(alertId);
+                if (alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }
+            }, 5000);
+        }
+
+        function getAlertIcon(type) {
+            const icons = {
+                'success': 'check-circle',
+                'danger': 'exclamation-triangle',
+                'warning': 'exclamation-triangle',
+                'info': 'info-circle'
+            };
+            return icons[type] || 'info-circle';
+        }
+
+        // Validación del documento
+        function validateDocumento(event) {
+            const input = event.target;
+            let value = input.value.replace(/\D/g, ''); // Solo números
+            
+            if (value.length > 8) {
+                value = value.substring(0, 8); // Máximo 8 dígitos
+            }
+            
+            input.value = value;
+        }
+
+        // Función para actualizar paciente
+        async function handleUpdatePatient(event) {
+            event.preventDefault();
+            
+            console.log('💾 [EDITAR-PACIENTE] Iniciando actualización de paciente...');
+            
+            // Obtener datos del formulario
+            const formData = {
+                nombre: document.getElementById('nombre').value.trim(),
+                documento: document.getElementById('documento').value.trim(),
+                nacimiento: document.getElementById('nacimiento').value,
+                localidad: document.getElementById('localidad').value.trim() || null,
+                sexo: document.getElementById('sexo').value || null,
+                mail: document.getElementById('mail').value.trim() || null,
+                obra_social: document.getElementById('obra_social').value.trim() || null,
+                importante: document.getElementById('importante').value.trim() || null
+            };
+
+            // Validaciones básicas
+            if (!formData.nombre) {
+                showAlert('El nombre es obligatorio', 'danger');
+                document.getElementById('nombre').focus();
+                return;
+            }
+
+            if (!formData.documento) {
+                showAlert('El documento es obligatorio', 'danger');
+                document.getElementById('documento').focus();
+                return;
+            }
+
+            if (formData.documento.length < 5) {
+                showAlert('El documento debe tener al menos 5 dígitos', 'danger');
+                document.getElementById('documento').focus();
+                return;
+            }
+
+            if (!formData.nacimiento) {
+                showAlert('La fecha de nacimiento es obligatoria', 'danger');
+                document.getElementById('nacimiento').focus();
+                return;
+            }
+
+            // Validación de email si se proporciona
+            if (formData.mail && !isValidEmail(formData.mail)) {
+                showAlert('El email no tiene un formato válido', 'danger');
+                document.getElementById('mail').focus();
+                return;
+            }
+
+            const saveBtn = document.getElementById('saveBtn');
+            const btnText = saveBtn.querySelector('.btn-text');
+            const spinner = document.getElementById('saveSpinner');
+            
+            // Mostrar loading
+            saveBtn.disabled = true;
+            btnText.innerHTML = '<i class="bi bi-clock me-2"></i>Guardando...';
+            spinner.classList.remove('d-none');
+            
+            try {
+                console.log('📤 [EDITAR-PACIENTE] Enviando datos:', formData);
+                
+                // Obtener token de autenticación
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    console.error('Token no encontrado. Usuario no autenticado.');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const response = await fetch(`${API_BASE_URL}/patients/${currentPatient.id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+                console.log('📥 [EDITAR-PACIENTE] Respuesta del servidor:', result);
+
+                if (result.success) {
+                    showAlert('✅ Paciente actualizado exitosamente', 'success');
+                    
+                    // Limpiar localStorage
+                    localStorage.removeItem('editingPatient');
+                    
+                    // Redirigir al index después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                    
+                } else {
+                    throw new Error(result.message || 'Error al actualizar el paciente');
+                }
+
+            } catch (error) {
+                console.error('❌ [EDITAR-PACIENTE] Error:', error);
+                showAlert(`Error al actualizar el paciente: ${error.message}`, 'danger');
+            } finally {
+                // Restaurar botón
+                saveBtn.disabled = false;
+                btnText.innerHTML = '<i class="bi bi-check-circle me-2"></i>Guardar Cambios';
+                spinner.classList.add('d-none');
+            }
+        }
+
+        // Función para eliminar paciente
+        async function handleDeletePatient() {
+            if (!confirm(`¿Está seguro que desea ELIMINAR permanentemente al paciente "${currentPatient.nombre}"?\n\n⚠️ Esta acción NO se puede deshacer.`)) {
+                return;
+            }
+
+            const deleteBtn = document.getElementById('deleteBtn');
+            deleteBtn.disabled = true;
+            deleteBtn.innerHTML = '<i class="bi bi-clock me-2"></i>Eliminando...';
+
+            try {
+                console.log('🗑️ [EDITAR-PACIENTE] Eliminando paciente:', currentPatient.id);
+                
+                const response = await fetch(`${API_BASE_URL}/patients/${currentPatient.id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                console.log('📥 [EDITAR-PACIENTE] Respuesta del servidor:', result);
+
+                if (result.success) {
+                    showAlert('✅ Paciente eliminado exitosamente', 'success');
+                    
+                    // Limpiar localStorage
+                    localStorage.removeItem('editingPatient');
+                    
+                    // Redirigir al index después de 2 segundos
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 2000);
+                    
+                } else {
+                    throw new Error(result.message || 'Error al eliminar el paciente');
+                }
+
+            } catch (error) {
+                console.error('❌ [EDITAR-PACIENTE] Error:', error);
+                showAlert(`Error al eliminar el paciente: ${error.message}`, 'danger');
+                
+                // Restaurar botón
+                deleteBtn.disabled = false;
+                deleteBtn.innerHTML = '<i class="bi bi-trash me-2"></i>Eliminar';
+            }
+        }
+
+        // Función para validar email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Función para cancelar
+        function handleCancel() {
+            if (confirm('¿Está seguro que desea cancelar? Se perderán los cambios no guardados.')) {
+                localStorage.removeItem('editingPatient');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Manejar tecla Escape para cancelar
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                handleCancel();
+            }
+        });
+    </script>
+</body>
+</html>
