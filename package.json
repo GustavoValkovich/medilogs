@@ -1,0 +1,70 @@
+{
+  "name": "medilogs",
+  "version": "3.0.0",
+  "description": "Sistema de gestión médica optimizado - MediLogs con arquitectura modular, seguridad avanzada y manejo de archivos",
+  "main": "dist/core/app.js",
+  "scripts": {
+    "build": "npx tsc",
+    "start": "node dist/core/server-safe.js",
+    "start:prod": "NODE_ENV=production node dist/core/server-safe.js",
+    "dev": "npx ts-node src/core/server.ts",
+    "dev:clean": "npm run clean && npm run dev",
+    "dev:watch": "npx nodemon --exec \"npx ts-node src/core/server.ts\"",
+    "clean": "rm -rf dist",
+    "lint": "echo \"Linting not configured yet\"",
+    "type-check": "npx tsc --noEmit",
+    "test": "echo \"Tests not configured yet\"",
+    "test:excel": "npx ts-node scripts/test-excel.ts",
+    "migrate": "echo \"Migrations not configured yet\"",
+    "seed": "echo \"Seeding not configured yet\"",
+    "setup": "node scripts/setup-initial-doctor.js",
+    "setup:doctor": "node scripts/setup-initial-doctor.js",
+    "docker:build": "docker build -t medilogs .",
+    "docker:run": "docker run -p 3000:3000 medilogs",
+    "audit:fix": "npm audit fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GustavoValkovich/medilogs3.git"
+  },
+  "author": "Gustavo Valkovich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GustavoValkovich/medilogs3/issues"
+  },
+  "homepage": "https://github.com/GustavoValkovich/medilogs3#readme",
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.0.9",
+    "@types/node-fetch": "^2.6.12",
+    "node-fetch": "^2.7.0",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/form-data": "^2.2.1",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.0.0",
+    "@types/pg": "^8.15.4",
+    "@types/xlsx": "^0.0.35",
+    "bcrypt": "^6.0.0",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.1",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.1",
+    "form-data": "^4.0.3",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.1",
+    "pg": "^8.16.3",
+    "puppeteer": "^24.12.1",
+    "xlsx": "^0.18.5"
+  },
+  "types": "./dist/app.d.ts"
+}
