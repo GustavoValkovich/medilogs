@@ -488,9 +488,8 @@ Contraseña: 123456
 ## Soporte
 
 ### Contacto
-- **Email:** gustavo.valkovich@example.com
+- **Email:** gustavo.valkovich@gmail.com
 - **GitHub:** [@GustavoValkovich](https://github.com/GustavoValkovich)
-- **Issues:** [GitHub Issues](https://github.com/GustavoValkovich/medilogs/issues)
 
 ### Recursos Útiles
 - [Documentación técnica](./back/README.md)
