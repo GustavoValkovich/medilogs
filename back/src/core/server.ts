@@ -212,11 +212,9 @@ const main = async (): Promise<void> => {
     // Validar configuración
     validateConfig();
     
-    // Importar y configurar la aplicación
-    const { createApp } = await import('./app');
-    
-    // Crear la aplicación Express
-    const app = createApp();
+  // Importar la aplicación Express
+  const appModule = await import('./app');
+  const app = appModule.default;
     
     // Probar la conexión a la base de datos
     logger.info('🔍 Probando conexión a la base de datos...');
