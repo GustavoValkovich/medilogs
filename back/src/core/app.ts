@@ -14,7 +14,7 @@ import { patientsRouter, doctorsRouter, consultationsRouter, authRouter, filesRo
 /**
  * Crear y configurar la aplicación Express
  */
-export const createApp = (): express.Application => {
+const app = (() => {
   const app = express();
   
   // ==================== MIDDLEWARE DE SEGURIDAD ====================
@@ -294,6 +294,11 @@ export const createApp = (): express.Application => {
   });
   
   // ==================== RUTAS MODULARES ====================
+
+  // Endpoint de salud para pruebas automatizadas
+  app.get(`${config.apiPrefix}/health`, (req, res) => {
+    res.status(200).json({ status: 'ok' });
+  });
   
   // Rutas de autenticación
   app.use(`${config.apiPrefix}/auth`, authRouter);
@@ -325,5 +330,8 @@ export const createApp = (): express.Application => {
   app.use(notFoundHandler);
   app.use(errorHandler);
   
+
   return app;
-};
+})();
+
+export default app;
