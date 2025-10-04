@@ -1,5 +1,9 @@
 // src/app.ts
 import express, { Request, Response } from "express";
+// Tenemos que agregar las rutas cuando las tengamos
+// import { router as patientRouter } from "./patient/patient.routes.js";
+// import { router as doctorRouter } from "./doctor/doctor.routes.js";
+
 
 const app = express();
 
