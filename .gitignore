@@ -1,0 +1,49 @@
+# -----------------------------
+# Node / TypeScript base
+# -----------------------------
+
+# dependencias
+node_modules/
+
+# compilados de TypeScript
+dist/
+build/
+
+# archivos de entorno (nunca subir contraseñas)
+.env
+.env.*
+
+# logs y reportes
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs/
+*.log
+
+# coverage y tests
+coverage/
+*.lcov
+jest-results.json
+
+# cache y temporales
+.DS_Store
+Thumbs.db
+.tmp/
+.cache/
+*.tmp
+
+# sistema operativo / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# docker
+postgres_data/
+docker-data/
+*.pid
+
+# archivos REST Client (si no querés subirlos)
+*.http
