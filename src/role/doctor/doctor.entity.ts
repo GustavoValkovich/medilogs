@@ -1,5 +1,4 @@
 export interface Doctor {
-  id?: number; // opcional porque lo genera la BD
   first_name: string;
   last_name: string;
   specialty: string;

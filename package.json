@@ -21,14 +21,24 @@
   "description": "",
   "type": "module",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
+    "bcryptjs": "^2.4.3",
+    "module-alias": "^2.2.3",
+    "morgan": "^1.10.0",
     "pg": "^8.16.3"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^24.6.2",
     "@types/pg": "^8.15.5",
     "tsc-watch": "^7.2.0",
     "typescript": "^5.9.3"
+  },
+  "_moduleAliases": {
+    "role": "dist/role"
   }
 }
