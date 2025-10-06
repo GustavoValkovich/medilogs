@@ -3,9 +3,9 @@ import express from "express";
 import cors from "cors";
 import morgan from "morgan";
 
-import doctorRoutes from "role/doctor/doctor.routes";
-import patientRoutes from "role/patient/patient.routes";
-import consultationRoutes from "role/consultation/consultation.routes";
+import doctorRoutes from "./role/doctor/doctor.routes.js";
+import patientRoutes from "./role/patient/patient.routes.js";
+import consultationRoutes from "./role/consultation/consultation.routes.js";
 
 const app = express();
 

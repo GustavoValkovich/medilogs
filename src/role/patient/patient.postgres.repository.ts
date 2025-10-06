@@ -1,4 +1,4 @@
-import { pool } from "../../db/connection";
+import { pool } from "../../db/connection.js";
 import { Patient } from "./patient.entity.js";
 import { PatientRepository } from "./patient.repository.interface.js";
 
