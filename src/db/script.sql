@@ -54,9 +54,11 @@ CREATE TRIGGER update_patients_updated_at
 CREATE TABLE IF NOT EXISTS consultations (
   id             SERIAL PRIMARY KEY,
   patient_id     INTEGER REFERENCES patients(id),
+  doctor_id      INTEGER REFERENCES doctors(id),
   record_date    DATE,
   medical_record TEXT,
   image          VARCHAR(500),
+  deleted_at     TIMESTAMPTZ,
   created_at     TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

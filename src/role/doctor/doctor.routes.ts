@@ -2,6 +2,7 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import { DoctorPostgresRepository } from './doctor.postgres.repository.js';
 import { Doctor } from './doctor.entity.js';
+import auth, { AuthRequest } from '../../middlewares/auth.js';
 
 const router = express.Router();
 const repo = new DoctorPostgresRepository();
@@ -33,6 +34,27 @@ router.post('/', async (req, res) => {
 	if (!created) return res.status(500).json({ message: 'No se pudo crear el doctor' });
 	if ((created as any).password) delete (created as any).password;
 	res.status(201).json(created);
+});
+
+// POST /login - login para doctores, retorna JWT
+router.post('/login', async (req, res) => {
+	const { email, password } = req.body as { email?: string; password?: string };
+	if (!email || !password) return res.status(400).json({ message: 'Email y password requeridos' });
+
+	// Buscar doctor por email
+	const all = await repo.findAll();
+	const user = (all || []).find((d) => (d as any).email === email);
+	if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
+
+	const hashed = (user as any).password;
+	const match = hashed ? await bcrypt.compare(password, hashed) : false;
+	if (!match) return res.status(401).json({ message: 'Credenciales inválidas' });
+
+	// Generar token con id y rol
+		const token = auth.generateToken({ id: (user as any).id, role: 'doctor' });
+	const result = { ...user } as any;
+	if (result.password) delete result.password;
+	res.json({ token, user: result });
 });
 
 // PUT /:id - reemplazar doctor (hash password si se proporciona)

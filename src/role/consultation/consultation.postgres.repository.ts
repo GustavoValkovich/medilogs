@@ -4,34 +4,34 @@ import { ConsultationRepository } from "./consultation.repository.interface.js";
 
 export class ConsultationPostgresRepository implements ConsultationRepository {
   async findAll(): Promise<Consultation[] | undefined> {
-    const res = await pool.query("SELECT * FROM consultations ORDER BY id ASC");
+    const res = await pool.query("SELECT * FROM consultations WHERE deleted_at IS NULL ORDER BY id ASC");
     return res.rows;
   }
 
   async findOne(id: string): Promise<Consultation | undefined> {
-    const res = await pool.query("SELECT * FROM consultations WHERE id = $1", [id]);
+    const res = await pool.query("SELECT * FROM consultations WHERE id = $1 AND deleted_at IS NULL", [id]);
     return res.rows[0];
   }
 
   async add(consultation: Consultation): Promise<Consultation | undefined> {
-    const { patient_id, record_date, medical_record, image } = consultation;
+    const { patient_id, doctor_id, record_date, medical_record, image } = consultation;
     const res = await pool.query(
-      `INSERT INTO consultations (patient_id, record_date, medical_record, image)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO consultations (patient_id, doctor_id, record_date, medical_record, image)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [patient_id, record_date, medical_record, image]
+      [patient_id, doctor_id, record_date, medical_record, image]
     );
     return res.rows[0];
   }
 
   async update(id: string, consultation: Consultation): Promise<Consultation | undefined> {
-    const { patient_id, record_date, medical_record, image } = consultation;
+    const { patient_id, doctor_id, record_date, medical_record, image } = consultation;
     const res = await pool.query(
       `UPDATE consultations
-       SET patient_id=$1, record_date=$2, medical_record=$3, image=$4
-       WHERE id=$5
+       SET patient_id=$1, doctor_id=$2, record_date=$3, medical_record=$4, image=$5
+       WHERE id=$6 AND deleted_at IS NULL
        RETURNING *`,
-      [patient_id, record_date, medical_record, image, id]
+      [patient_id, doctor_id, record_date, medical_record, image, id]
     );
     return res.rows[0];
   }
@@ -42,13 +42,13 @@ export class ConsultationPostgresRepository implements ConsultationRepository {
     if (keys.length === 0) return undefined;
 
     const setClause = keys.map((k, i) => `${k}=$${i + 1}`).join(", ");
-    const query = `UPDATE consultations SET ${setClause} WHERE id=$${keys.length + 1} RETURNING *`;
+    const query = `UPDATE consultations SET ${setClause} WHERE id=$${keys.length + 1} AND deleted_at IS NULL RETURNING *`;
     const res = await pool.query(query, [...values, id]);
     return res.rows[0];
   }
 
   async delete(id: string): Promise<boolean> {
-    const res = await pool.query("DELETE FROM consultations WHERE id=$1", [id]);
+    const res = await pool.query("UPDATE consultations SET deleted_at = CURRENT_TIMESTAMP WHERE id=$1 AND deleted_at IS NULL", [id]);
     return res.rowCount !== null && res.rowCount > 0;
   }
 }
