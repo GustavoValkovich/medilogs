@@ -1,11 +1,13 @@
 {
   "name": "medilogs",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/server.js\"",
-    "dev": "npm run start:dev"
+    "dev": "npm run start:dev",
+    "test": "jest --coverage"
   },
   "repository": {
     "type": "git",
@@ -19,7 +21,6 @@
   },
   "homepage": "https://github.com/GustavoValkovich/medilogs#readme",
   "description": "",
-  "type": "module",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -33,9 +34,15 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.7.0",
     "@types/pg": "^8.15.5",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "rimraf": "^6.0.1",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.4",
     "tsc-watch": "^7.2.0",
     "typescript": "^5.9.3"
   },

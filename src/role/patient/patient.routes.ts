@@ -1,25 +1,15 @@
 import express from 'express';
 import { PatientPostgresRepository } from './patient.postgres.repository.js';
 import { Patient } from './patient.entity.js';
+import { PatientController } from './patient.controller.js';
 
 const router = express.Router();
 const repo = new PatientPostgresRepository();
+const controller = new PatientController(repo);
 
-// GET / - listar todos los pacientes
-router.get('/', async (req, res) => {
-	const items = await repo.findAll();
-	res.json(items || []);
-});
+router.get('/', controller.findAllPatients);
+router.get('/:id', controller.findPatientById);
 
-// GET /:id - obtener paciente
-router.get('/:id', async (req, res) => {
-	const { id } = req.params;
-	const item = await repo.findOne(id);
-	if (!item) return res.status(404).json({ message: 'Paciente no encontrado' });
-	res.json(item);
-});
-
-// POST / - crear paciente
 router.post('/', async (req, res) => {
 	const data: Patient = req.body;
 	const created = await repo.add(data);
@@ -27,7 +17,6 @@ router.post('/', async (req, res) => {
 	res.status(201).json(created);
 });
 
-// PUT /:id - reemplazar paciente
 router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	const data: Patient = req.body;
@@ -36,7 +25,6 @@ router.put('/:id', async (req, res) => {
 	res.json(updated);
 });
 
-// PATCH /:id - actualización parcial (whitelist)
 router.patch('/:id', async (req, res) => {
 	const { id } = req.params;
 	const updates = req.body as Partial<Patient>;
@@ -53,7 +41,6 @@ router.patch('/:id', async (req, res) => {
 	res.json(updated);
 });
 
-// DELETE /:id - eliminar paciente
 router.delete('/:id', async (req, res) => {
 	const { id } = req.params;
 	const ok = await repo.delete(id);
