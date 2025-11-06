@@ -1,4 +1,3 @@
-// src/app.ts
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -9,12 +8,9 @@ import consultationRoutes from "./role/consultation/consultation.routes.js";
 
 const app = express();
 
-// Middlewares
 app.use(cors());
 app.use(morgan("dev"));
 app.use(express.json());
-
-// Routes
 app.use("/api/doctors", doctorRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/consultations", consultationRoutes);

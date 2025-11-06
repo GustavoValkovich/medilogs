@@ -35,10 +35,15 @@ router.get('/', controller.findAllPatients);
 router.get('/:id', controller.findPatientById);
 
 router.post('/', async (req, res) => {
-  const data: Patient = req.body;
-  const created = await repo.add(data);
-  if (!created) return res.status(500).json({ message: 'No se pudo crear el paciente' });
-  res.status(201).json(created);
+  try {
+    const data: Patient = req.body;
+    const created = await repo.add(data);
+    if (!created) return res.status(500).json({ message: 'No se pudo crear el paciente' });
+    res.status(201).json(created);
+  } catch (err: any) {
+  console.error('Error creating patient:', err);
+  return res.status(500).json({ message: 'Error interno al crear paciente', error: err?.message || String(err) });
+  }
 });
 
 router.put('/:id', async (req, res) => {

@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS doctors (
   updated_at      TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+-- ensure trigger can be recreated safely
+DROP TRIGGER IF EXISTS update_doctors_updated_at ON doctors;
 CREATE TRIGGER update_doctors_updated_at
   BEFORE UPDATE ON doctors
   FOR EACH ROW
@@ -31,7 +33,7 @@ CREATE TRIGGER update_doctors_updated_at
 
 CREATE TABLE IF NOT EXISTS patients (
   id           SERIAL PRIMARY KEY,
-  doctor_id    INTEGER REFERENCES doctors(id),
+  doctor_id    INTEGER REFERENCES doctors(id) ON DELETE SET NULL ON UPDATE CASCADE,
   full_name    VARCHAR(255),
   document     VARCHAR(50),
   birth_date   DATE,
@@ -44,6 +46,7 @@ CREATE TABLE IF NOT EXISTS patients (
   updated_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TRIGGER IF EXISTS update_patients_updated_at ON patients;
 CREATE TRIGGER update_patients_updated_at
   BEFORE UPDATE ON patients
   FOR EACH ROW
@@ -63,6 +66,7 @@ CREATE TABLE IF NOT EXISTS consultations (
   updated_at     TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
+DROP TRIGGER IF EXISTS update_consultations_updated_at ON consultations;
 CREATE TRIGGER update_consultations_updated_at
   BEFORE UPDATE ON consultations
   FOR EACH ROW

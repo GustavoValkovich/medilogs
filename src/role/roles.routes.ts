@@ -1,13 +1,9 @@
 import { Router } from 'express';
 
-// Router genérico para roles. Si más tarde se necesitan endpoints concretos,
-// registra controladores específicos aquí.
 export const rolesRouter = Router();
-
-// Ejemplo: un endpoint health para comprobar que el router está activo
+// health check
 rolesRouter.get('/health', (req, res) => res.json({ ok: true }));
-
-// helper de sanitización
+// sanitization helper
 export function sanitizeCharacterInput(req: any, res: any, next: any) {
   req.body.sanitizedInput = {
     name: req.body?.name,

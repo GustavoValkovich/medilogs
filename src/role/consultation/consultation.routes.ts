@@ -7,13 +7,11 @@ const router = express.Router();
 const repo = new ConsultationPostgresRepository();
 const patientRepo = new PatientPostgresRepository();
 
-// GET / - listar todas las consultas
 router.get('/', async (req, res) => {
 	const items = await repo.findAll();
 	res.json(items || []);
 });
 
-// GET /:id - obtener una consulta
 router.get('/:id', async (req, res) => {
 	const { id } = req.params;
 	const item = await repo.findOne(id);
@@ -21,7 +19,6 @@ router.get('/:id', async (req, res) => {
 	res.json(item);
 });
 
-// POST / - crear consulta (solo doctor owner del paciente)
 router.post('/', async (req, res) => {
 	const data: Consultation = req.body;
 	const patientId = data.patient_id;
@@ -36,7 +33,6 @@ router.post('/', async (req, res) => {
 	res.status(201).json(created);
 });
 
-// PUT /:id - reemplazar consulta (solo doctor owner del paciente)
 router.put('/:id', async (req, res) => {
 	const { id } = req.params;
 	const data: Consultation = req.body;
@@ -50,7 +46,6 @@ router.put('/:id', async (req, res) => {
 	res.json(updated);
 });
 
-// PATCH /:id - actualización parcial (solo doctor owner del paciente)
 router.patch('/:id', async (req, res) => {
 	const { id } = req.params;
 	const updates: Partial<Consultation> = req.body;
@@ -65,7 +60,6 @@ router.patch('/:id', async (req, res) => {
 	res.json(updated);
 });
 
-// DELETE /:id - eliminar consulta (solo doctor owner del paciente)
 router.delete('/:id', async (req, res) => {
 	const { id } = req.params;
 	const existing = await repo.findOne(id);

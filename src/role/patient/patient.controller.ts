@@ -1,4 +1,3 @@
-// src/role/patient/patient.controller.ts
 import type { Request, Response } from 'express';
 
 export class PatientController {

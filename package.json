@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/server.js\"",
+  "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/server.js\"",
     "dev": "npm run start:dev",
+  "db:init": "docker cp src/db/script.sql postgres:/tmp/script.sql && docker exec -i postgres psql -U postgres -d medilogs -f /tmp/script.sql",
     "test": "jest --coverage"
   },
   "repository": {
