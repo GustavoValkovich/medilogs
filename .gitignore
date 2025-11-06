@@ -47,3 +47,4 @@ docker-data/
 
 # archivos REST Client (si no querés subirlos)
 *.http
+dist/
