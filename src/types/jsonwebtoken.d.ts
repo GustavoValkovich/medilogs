@@ -1,1 +1,1 @@
-declare module 'jsonwebtoken';
+// jsonwebtoken types removed - package no longer used

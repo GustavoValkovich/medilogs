@@ -2,7 +2,6 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import { DoctorPostgresRepository } from './doctor.postgres.repository.js';
 import { Doctor } from './doctor.entity.js';
-import auth, { AuthRequest } from '../../middlewares/auth.js';
 import { DoctorController } from './doctor.controller.js';
 
 const router = express.Router();
@@ -33,10 +32,9 @@ router.post('/login', async (req, res) => {
   const hashed = (user as any).password;
   const match = hashed ? await bcrypt.compare(password, hashed) : false;
   if (!match) return res.status(401).json({ message: 'Credenciales inválidas' });
-  const token = auth.generateToken({ id: (user as any).id, role: 'doctor' });
   const result = { ...user } as any;
   if (result.password) delete result.password;
-  res.json({ token, user: result });
+  res.json({ user: result });
 });
 
 router.put('/:id', async (req, res) => {

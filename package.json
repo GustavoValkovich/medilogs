@@ -22,13 +22,12 @@
   "homepage": "https://github.com/GustavoValkovich/medilogs#readme",
   "description": "",
   "dependencies": {
-    "bcryptjs": "^3.0.2",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "module-alias": "^2.2.3",
-    "morgan": "^1.10.0",
-    "pg": "^8.16.3"
+  "bcryptjs": "^3.0.2",
+  "cors": "^2.8.5",
+  "express": "^5.1.0",
+  "module-alias": "^2.2.3",
+  "morgan": "^1.10.0",
+  "pg": "^8.16.3"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
