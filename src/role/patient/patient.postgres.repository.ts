@@ -51,8 +51,8 @@ export class PatientPostgresRepository implements PatientRepository {
   }
 
   async delete(id: string): Promise<boolean> {
-    // Instead of deleting consultations, set their patient_id to NULL so history is preserved.
-    // This also avoids FK violations on delete. The operation is performed inside a transaction.
+    //en vez de borrar una consulta (por posibles conflictos legales) se pasa el patient_id a NULL 
+    //se evita problemas de referencias a FK
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
