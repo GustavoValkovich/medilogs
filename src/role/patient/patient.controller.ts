@@ -34,12 +34,8 @@ export class PatientController {
     const { id } = req.params;
     const found = await this.repo.findOne(id);
     if (!found) return res.status(404).json({ message: 'Paciente no encontrado' });
-    // Verificación de pertenencia por doctor (opcional):
-    // Si el cliente envía el id del doctor solicitante (por header 'x-doctor-id', query o body),
-    // se rechaza la petición con 403 si no coincide con el doctor_id del paciente.
-    // Esto es lógica HTTP simple (sin guards ni encriptación) para evitar que doctores diferentes
-    // lean pacientes que no les pertenecen.
-    // Nota: si no se envía ningún identificador de doctor, se mantiene el comportamiento previo.
+
+    
     const reqDoctorIdRaw = (req as any).headers?.['x-doctor-id'] ?? (req as any).query?.doctor_id ?? (req as any).body?.doctor_id;
     if (reqDoctorIdRaw !== undefined && reqDoctorIdRaw !== null) {
       const reqDoctorId = Number(reqDoctorIdRaw);
