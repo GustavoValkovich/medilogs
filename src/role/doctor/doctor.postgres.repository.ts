@@ -32,6 +32,9 @@ export class DoctorPostgresRepository implements DoctorRepository {
       );
       return res.rows[0];
     } catch (error) {
+      // Log DB error for debugging (do not expose internals to clients)
+      // eslint-disable-next-line no-console
+      console.error('DoctorPostgresRepository.add error:', (error as Error).message || error);
       return undefined;
     }
   }
@@ -57,6 +60,8 @@ export class DoctorPostgresRepository implements DoctorRepository {
       );
       return res.rows[0];
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('DoctorPostgresRepository.update error:', (error as Error).message || error);
       return undefined;
     }
   }
@@ -74,6 +79,8 @@ export class DoctorPostgresRepository implements DoctorRepository {
       const res = await pool.query(query, [...values, id]);
       return res.rows[0];
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('DoctorPostgresRepository.partialUpdate error:', (error as Error).message || error);
       return undefined;
     }
   }
@@ -83,6 +90,8 @@ export class DoctorPostgresRepository implements DoctorRepository {
       const res = await pool.query('DELETE FROM doctors WHERE id = $1 RETURNING *', [id]);
       return res.rows[0];
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('DoctorPostgresRepository.delete error:', (error as Error).message || error);
       return undefined;
     }
   }

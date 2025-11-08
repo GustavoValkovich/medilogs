@@ -60,6 +60,20 @@ describe('PatientController', () => {
     expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
   });
 
+  it('findPatientById devuelve 403 si el doctor solicitante es distinto del doctor del paciente', async () => {
+    req.params.id = '1';
+    // paciente pertenece al doctor 2
+    repo.findOne.mockResolvedValue({ id: 1, name: 'PacienteX', doctor_id: 2 });
+    // la petición viene del doctor 3
+    req.headers = { 'x-doctor-id': '3' };
+
+    await controller.findPatientById(req, res);
+
+    expect(repo.findOne).toHaveBeenCalledWith('1');
+    expect(res.status).toHaveBeenCalledWith(403);
+    expect(res.json).toHaveBeenCalledWith({ message: 'Acceso denegado: paciente perteneciente a otro doctor' });
+  });
+
   it('addPatient crea y devuelve 201', async () => {
     const nuevo = { name: 'Juan' };
     req.body = nuevo;

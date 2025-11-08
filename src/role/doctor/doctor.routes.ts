@@ -12,15 +12,31 @@ router.get('/', controller.findAllDoctors);
 router.get('/:id', controller.findDoctorById);
 
 router.post('/', async (req, res) => {
-  const data: Doctor = req.body;
-  if (data.password) {
-    const salt = await bcrypt.genSalt(10);
-    data.password = await bcrypt.hash(data.password, salt);
+  try {
+    const data: Doctor = req.body;
+
+    // Validate required fields according to DB NOT NULL constraints
+    const required = ['first_name', 'last_name', 'specialty', 'license_number', 'password'];
+    const missing = required.filter((f) => !(f in (data as any)) || (data as any)[f] === undefined || (data as any)[f] === '');
+    if (missing.length > 0) return res.status(400).json({ message: 'Faltan campos requeridos', missing });
+
+    if (data.password) {
+      const salt = await bcrypt.genSalt(10);
+      data.password = await bcrypt.hash(data.password, salt);
+    }
+
+    const created = await repo.add(data);
+    if (!created) {
+      // Log generic failure (repo should log DB error). Return generic message to client.
+      return res.status(500).json({ message: 'No se pudo crear el doctor' });
+    }
+    if ((created as any).password) delete (created as any).password;
+    res.status(201).json(created);
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('POST /api/doctors error:', (err as Error).message || err);
+    res.status(500).json({ message: 'Error interno al crear doctor' });
   }
-  const created = await repo.add(data);
-  if (!created) return res.status(500).json({ message: 'No se pudo crear el doctor' });
-  if ((created as any).password) delete (created as any).password;
-  res.status(201).json(created);
 });
 
 router.post('/login', async (req, res) => {

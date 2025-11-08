@@ -7,8 +7,8 @@ const router = express.Router();
 const repo = new PatientPostgresRepository();
 
 const repoAdapter = {
-  async findAll(): Promise<any[]> {
-    const rows = await repo.findAll();
+  async findAll(doctorId?: number): Promise<any[]> {
+    const rows = await repo.findAll(doctorId);
     return rows ?? [];
   },
   async findOne(id: string): Promise<any> {

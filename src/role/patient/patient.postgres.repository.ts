@@ -3,7 +3,11 @@ import { Patient } from "./patient.entity.js";
 import { PatientRepository } from "./patient.repository.interface.js";
 
 export class PatientPostgresRepository implements PatientRepository {
-  async findAll(): Promise<Patient[] | undefined> {
+  async findAll(doctorId?: number): Promise<Patient[] | undefined> {
+    if (doctorId !== undefined && doctorId !== null && !Number.isNaN(Number(doctorId))) {
+      const result = await pool.query("SELECT * FROM patients WHERE doctor_id = $1 ORDER BY id ASC", [doctorId]);
+      return result.rows;
+    }
     const result = await pool.query("SELECT * FROM patients ORDER BY id ASC");
     return result.rows;
   }

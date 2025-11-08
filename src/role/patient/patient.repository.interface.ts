@@ -1,7 +1,7 @@
 import { Patient } from "./patient.entity.js";
 
 export interface PatientRepository {
-  findAll(): Promise<Patient[] | undefined>;
+  findAll(doctorId?: number): Promise<Patient[] | undefined>;
   findOne(id: string): Promise<Patient | undefined>;
   add(patient: Patient): Promise<Patient | undefined>;
   update(id: string, patient: Patient): Promise<Patient | undefined>;
