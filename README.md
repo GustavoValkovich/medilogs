@@ -79,22 +79,3 @@ src/
 ## Main routes
 
 Routes are organized under `src/role/*`. Open the `*.routes.ts` files inside each folder (`doctor`, `patient`, `consultation`) to see available endpoints and their request/response shapes.
-
-# Medilogs – Backend
-
-API REST en Node.js + TypeScript para gestionar consultas médicas de pacientes.
-
-## Stack tecnológico
-
-- Node.js + TypeScript
-- Express
-- PostgreSQL (vía `pg`)
-- Docker + Docker Compose
-- Jest + ts-jest (tests)
-- `bcryptjs` (hash de contraseñas)
-- CORS, Morgan (logging)
-
-## Requisitos
-
-- Node.js'
-- Docker y Docker Compose (para ejecutar la base de datos)
