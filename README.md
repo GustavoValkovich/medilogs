@@ -14,7 +14,7 @@ REST API built with Node.js and TypeScript to manage medical consultations for p
 
 ## Requirements
 
-- Node.js (v18+ recommended)
+- Node.js
 - Docker and Docker Compose (for the database)
 
 ## Installation & Usage
@@ -61,7 +61,7 @@ POSTGRES_PASSWORD=postgres
 POSTGRES_DB=medilogs
 ```
 
-## Project structure (high level)
+## Project structure
 
 ```text
 src/
