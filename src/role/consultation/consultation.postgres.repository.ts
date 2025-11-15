@@ -14,31 +14,33 @@ export class ConsultationPostgresRepository implements ConsultationRepository {
   }
 
   async add(consultation: Consultation): Promise<Consultation | undefined> {
-    const { patient_id, doctor_id, record_date, medical_record, image } = consultation;
+    const { patient_id, medical_record, image } = consultation;
     const res = await pool.query(
-      `INSERT INTO consultations (patient_id, doctor_id, record_date, medical_record, image)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO consultations (patient_id, medical_record, image)
+       VALUES ($1, $2, $3)
        RETURNING *`,
-      [patient_id, doctor_id, record_date, medical_record, image]
+      [patient_id, medical_record, image]
     );
     return res.rows[0];
   }
 
   async update(id: string, consultation: Consultation): Promise<Consultation | undefined> {
-    const { patient_id, doctor_id, record_date, medical_record, image } = consultation;
+    const { patient_id, medical_record, image } = consultation;
     const res = await pool.query(
       `UPDATE consultations
-       SET patient_id=$1, doctor_id=$2, record_date=$3, medical_record=$4, image=$5
-       WHERE id=$6 AND deleted_at IS NULL
+       SET patient_id=$1, medical_record=$2, image=$3
+       WHERE id=$4 AND deleted_at IS NULL
        RETURNING *`,
-      [patient_id, doctor_id, record_date, medical_record, image, id]
+      [patient_id, medical_record, image, id]
     );
     return res.rows[0];
   }
 
   async partialUpdate(id: string, updates: Partial<Consultation>): Promise<Consultation | undefined> {
-    const keys = Object.keys(updates as Record<string, unknown>);
-    const values = Object.values(updates as Record<string, unknown>);
+    // Only allow updating specific columns that exist in the DB
+    const allowed = ['patient_id', 'medical_record', 'image', 'deleted_at'];
+    const keys = Object.keys(updates as Record<string, unknown>).filter((k) => allowed.includes(k));
+    const values = keys.map((k) => (updates as any)[k]);
     if (keys.length === 0) return undefined;
 
     const setClause = keys.map((k, i) => `${k}=$${i + 1}`).join(", ");
@@ -47,8 +49,24 @@ export class ConsultationPostgresRepository implements ConsultationRepository {
     return res.rows[0];
   }
 
+  async softDelete(id: string, deleted_at?: string): Promise<Consultation | undefined> {
+    const res = await pool.query(
+      "UPDATE consultations SET deleted_at = COALESCE($2, CURRENT_TIMESTAMP) WHERE id=$1 AND deleted_at IS NULL RETURNING *",
+      [id, deleted_at]
+    );
+    return res.rows[0];
+  }
+
+  async restore(id: string): Promise<Consultation | undefined> {
+    const res = await pool.query(
+      "UPDATE consultations SET deleted_at = NULL WHERE id=$1 AND deleted_at IS NOT NULL RETURNING *",
+      [id]
+    );
+    return res.rows[0];
+  }
+
   async delete(id: string): Promise<boolean> {
-    const res = await pool.query("UPDATE consultations SET deleted_at = CURRENT_TIMESTAMP WHERE id=$1 AND deleted_at IS NULL", [id]);
+    const res = await pool.query("DELETE FROM consultations WHERE id=$1", [id]);
     return res.rowCount !== null && res.rowCount > 0;
   }
 }

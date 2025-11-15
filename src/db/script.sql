@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS patients (
   insurance    VARCHAR(255),
   email        VARCHAR(255),
   city         VARCHAR(255),
+  deleted_at   TIMESTAMPTZ,
   created_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
   updated_at   TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
@@ -57,8 +58,6 @@ CREATE TRIGGER update_patients_updated_at
 CREATE TABLE IF NOT EXISTS consultations (
   id             SERIAL PRIMARY KEY,
   patient_id     INTEGER REFERENCES patients(id) ON DELETE SET NULL ON UPDATE CASCADE,
-  doctor_id      INTEGER REFERENCES doctors(id),
-  record_date    DATE,
   medical_record TEXT,
   image          VARCHAR(500),
   deleted_at     TIMESTAMPTZ,

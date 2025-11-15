@@ -40,7 +40,6 @@ router.put('/:id', async (req, res) => {
 	const existing = await repo.findOne(id);
 	if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
 
-	data.doctor_id = data.doctor_id ?? existing.doctor_id;
 	const updated = await repo.update(id, data);
 	if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o no actualizada' });
 	res.json(updated);
@@ -52,8 +51,6 @@ router.patch('/:id', async (req, res) => {
 
 	const existing = await repo.findOne(id);
 	if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
-
-	(updates as any).doctor_id = (updates as any).doctor_id ?? existing.doctor_id;
 
 	const updated = await repo.partialUpdate(id, updates);
 	if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o no actualizada' });
@@ -69,6 +66,23 @@ router.delete('/:id', async (req, res) => {
 	const ok = await repo.delete(id);
 	if (!ok) return res.status(404).json({ message: 'Consulta no encontrada' });
 	res.status(204).send();
+});
+
+router.post('/:id/soft-delete', async (req, res) => {
+	const { id } = req.params;
+	const { deleted_at } = req.body as { deleted_at?: string };
+	const existing = await repo.findOne(id);
+	if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
+	const updated = await repo.softDelete(id, deleted_at);
+	if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o ya eliminada' });
+	res.json(updated);
+});
+
+router.post('/:id/restore', async (req, res) => {
+	const { id } = req.params;
+	const restored = await repo.restore(id);
+	if (!restored) return res.status(404).json({ message: 'Consulta no encontrada o no eliminada' });
+	res.json(restored);
 });
 
 export default router;

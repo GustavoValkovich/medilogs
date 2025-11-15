@@ -77,4 +77,29 @@ router.delete('/:id', async (req, res) => {
   res.status(204).send();
 });
 
+router.post('/:id/soft-delete', async (req, res) => {
+  const { id } = req.params;
+  const { deleted_at } = req.body as { deleted_at?: string };
+  try {
+    const updated = await repo.softDelete(id, deleted_at);
+    if (!updated) return res.status(404).json({ message: 'Paciente no encontrado o ya eliminado' });
+    res.json(updated);
+  } catch (err: any) {
+    console.error('Error soft-deleting patient:', err);
+    res.status(500).json({ message: 'Error interno al eliminar paciente', error: err?.message || String(err) });
+  }
+});
+
+router.post('/:id/restore', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const restored = await repo.restore(id);
+    if (!restored) return res.status(404).json({ message: 'Paciente no encontrado o no eliminado' });
+    res.json(restored);
+  } catch (err: any) {
+    console.error('Error restoring patient:', err);
+    res.status(500).json({ message: 'Error interno al restaurar paciente', error: err?.message || String(err) });
+  }
+});
+
 export default router;

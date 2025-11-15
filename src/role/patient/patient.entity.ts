@@ -11,4 +11,5 @@ export interface Patient {
   city?: string;
   created_at?: Date;
   updated_at?: Date;
+  deleted_at?: string | null;
 }
