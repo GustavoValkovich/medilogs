@@ -1,217 +1,46 @@
 # Medilogs API
 @baseUrl = http://localhost:3000
 
-### NOTA: `rolesRouter` está exportado en `roles.routes.ts` con GET /health
-### pero NO está montado en `app.ts`, por lo tanto no será accesible a menos que se importe y use.
-
 ################################################################################
-# DOCTORES (mount: /api/doctors — file: doctor.routes.ts)
-################################################################################
-
-### Listar todos los doctores
-GET {{baseUrl}}/api/doctors
-Accept: application/json
-
-# Expected: 200 OK, body: array de doctores
-
-### Obtener un doctor por id
-GET {{baseUrl}}/api/doctors/{{doctorId}}
-Accept: application/json
-
-# Expected: 200 OK con objeto doctor, 404 si no existe
-
-### Crear un doctor
-POST {{baseUrl}}/api/doctors
-Content-Type: application/json
-
-{
-  "first_name": "Ana",
-  "last_name": "Gonzalez",
-  "specialty": "Cardiologo",
-  "phone": "123465798",
-  "email": "ana@gmail.com",
-  "license_number": "12345",
-  "password": "admin"
-}
-
-# Requisitos: first_name, last_name, specialty, license_number, password
-# Comportamiento: password se hashea con bcrypt antes de guardar
-# Expected: 201 Created con la entidad creada (sin mostrar password)
-
-### Login de doctor (email + password)
-POST {{baseUrl}}/api/doctors/login
-Content-Type: application/json
-
-{
-  "email": "ana@gmail.com",
-  "password": "admin"
-}
-
-# Comportamiento: compara password con bcrypt
-# Respuestas: 400 si faltan campos, 401 si credenciales inválidas, 200 con usuario (sin password) si OK
-
-### Reemplazar/actualizar todo el recurso (PUT)
-PUT {{baseUrl}}/api/doctors/{{doctorId}}
-Content-Type: application/json
-
-{
-  "first_name": "Ana JAZMIN",
-  "last_name": "Gonzalez",
-  "specialty": "Cardiologo",
-  "phone": "123465798",
-  "email": "ana@gmail.com",
-  "license_number": "12345",
-  "password": "admin"
-}
-
-# Si incluye password, se hashea antes de guardar
-# Expected: 200 OK con entidad actualizada, 404 si no existe
-
-### Actualización parcial (PATCH)
-PATCH {{baseUrl}}/api/doctors/{{doctorId}}
-Content-Type: application/json
-
-{
-  "phone": "+5491199999999",
-  "password": "NUEVA CONTRASEÑA"
-}
-
-# Campos permitidos: first_name, last_name, specialty, phone, email, license_number, password
-# Si se actualiza password, se hashea
-
-
-################################################################################
-# PACIENTES (mount: /api/patients — file: patient.routes.ts)
+## Sequence to test (execute in order):
+## 1- Create a doctor
+## 2- Delete that doctor
+## 3- Create a second doctor
+## 4- Login with second doctor
+## 5- Create a patient
+## 6- SoftDelete that patient
+## 7- Create a second patient
+## 8- Create a consultation for the second patient
+## 9- SoftDelete the consultation
+## 10- SoftDelete the second patient
 ################################################################################
 
-### Listar pacientes
-GET {{baseUrl}}/api/patients
-Accept: application/json
+## 1- Create doctor 1
+$doc1 = Invoke-RestMethod -Uri 'http://localhost:3000/api/doctors' -Method Post -ContentType 'application/json' -Body (@{ first_name='Emiliano'; last_name='Druetta'; specialty='Cardiologo'; license_number='1001'; password='admin1' } | ConvertTo-Json)
 
-# Nota: puede aceptar filtro por doctorId en el repository adapter (interno)
-# Expected: 200 OK con array de pacientes
+## 2- Delete doctor 1
+Invoke-RestMethod -Uri "http://localhost:3000/api/doctors/$($doc1.id)" -Method Delete
 
-### Obtener paciente por id
-GET {{baseUrl}}/api/patients/{{patientId}}
-Accept: application/json
+## 3- Create doctor 2
+$doc2 = Invoke-RestMethod -Uri 'http://localhost:3000/api/doctors' -Method Post -ContentType 'application/json' -Body (@{ first_name='Diana'; last_name='Valkovich'; specialty='Otorrino'; license_number='2002'; email='diana@gmail.com'; password='admin2' } | ConvertTo-Json)
 
-# Expected: 200 OK con objeto paciente, 404 si no existe
+## 4- Login with second doctor
+$login = Invoke-RestMethod -Uri 'http://localhost:3000/api/doctors/login' -Method Post -ContentType 'application/json' -Body (@{ email='diana@gmail.com'; password='admin2' } | ConvertTo-Json)
 
-### Crear paciente
-POST {{baseUrl}}/api/patients
-Content-Type: application/json
+## 5- Create a patient (patient 1)
+$pat1 = Invoke-RestMethod -Uri "http://localhost:3000/api/patients" -Method Post -ContentType 'application/json' -Body (@{ doctor_id = $doc2.id; full_name = 'Paciente1 Diana'; document = '36372460'; birth_date = '1991-02-03' } | ConvertTo-Json)
 
-{
-  "doctor_id": 1,
-  "full_name": "María Pérez",
-  "document": "12345678",
-  "birth_date": "1985-06-15",
-  "notes": "Paciente con hipertensión",
-  "gender": "F",
-  "insurance": "OSDE",
-  "email": "maria.perez@example.com",
-  "city": "Buenos Aires"
-}
+## 6- SoftDelete that patient (soft delete via POST)
+Invoke-RestMethod -Uri "http://localhost:3000/api/patients/$($pat1.id)/soft-delete" -Method Post -ContentType 'application/json' -Body '{}'
 
-# Body se mapea a Patient y se guarda
-# Expected: 201 Created con la entidad creada
+## 7- Create a second patient (patient 2)
+$pat2 = Invoke-RestMethod -Uri "http://localhost:3000/api/patients" -Method Post -ContentType 'application/json' -Body (@{ doctor_id = $doc2.id; full_name = 'Paciente2 Diana'; document = '37254256'; birth_date = '1985-05-05' } | ConvertTo-Json)
 
-### Reemplazar/actualizar paciente completo (PUT)
-PUT {{baseUrl}}/api/patients/{{patientId}}
-Content-Type: application/json
+## 8- Create a consultation for patient 2
+$cons = Invoke-RestMethod -Uri "http://localhost:3000/api/consultations" -Method Post -ContentType 'application/json' -Body (@{ patient_id = $pat2.id; description = 'Initial consult'; date = '2025-11-17' } | ConvertTo-Json)
 
-{
-  "doctor_id": 2,
-  "full_name": "Roberto Rodriguez",
-  "document": "56654651",
-  "birth_date": "1955-06-15",
-  "notes": "Hipocondriaca",
-  "gender": "female",
-  "insurance": "PAMI",
-  "email": "maria.perez@example.com",
-  "city": "La Plata"
-}
+## 9- Delete the consultation (soft delete via POST)
+Invoke-RestMethod -Uri "http://localhost:3000/api/consultations/$($cons.id)/soft-delete" -Method Post -ContentType 'application/json' -Body '{}'
 
-# Expected: 200 OK, 404 si no existe
-
-### Actualización parcial (PATCH)
-PATCH {{baseUrl}}/api/patients/{{patientId}}
-Content-Type: application/json
-
-{
-  "city": "Córdoba",
-  "notes": "Cambio de ciudad"
-}
-
-# Campos permitidos: doctor_id, full_name, document, birth_date, notes, gender, insurance, email, city
-# Si no hay campos permitidos en el body, responde 400
-# Expected: 200 OK con entidad actualizada, 400/404 cuando corresponda
-
-### Eliminar paciente por id
-DELETE {{baseUrl}}/api/patients/{{patientId}}
-
-# Expected: 204 No Content si OK, 404 si no existe
-
-################################################################################
-# CONSULTAS (mount: /api/consultations — file: consultation.routes.ts)
-################################################################################
-
-### Listar todas las consultas
-GET {{baseUrl}}/api/consultations
-Accept: application/json
-
-# Expected: 200 OK con array de consultas
-
-### Obtener consulta por id
-GET {{baseUrl}}/api/consultations/{{consultationId}}
-Accept: application/json
-
-# Expected: 200 OK con objeto consulta, 404 si no existe
-
-### Crear una consulta
-POST {{baseUrl}}/api/consultations
-Content-Type: application/json
-
-{
-  "patient_id": 1,
-  "doctor_id": 2,
-  "record_date": "2025-11-14",
-  "medical_record": "Paciente con cuadro de prueba",
-  "image": "https://example.com/imagen.jpg"
-}
-
-# Requisito: patient_id es requerido y se valida existencia del paciente
-# Si paciente no existe -> 404
-# Expected: 201 Created con la consulta creada
-
-### Reemplazar/actualizar consulta completa (PUT)
-PUT {{baseUrl}}/api/consultations/{{consultationId}}
-Content-Type: application/json
-
-{
-  "patient_id": 1,
-  "doctor_id": 2,
-  "record_date": "2025-11-14",
-  "medical_record": "Actualización completa",
-  "image": "https://example.com/nueva.jpg"
-}
-
-# Verifica existencia antes de actualizar
-# Expected: 200 OK, 404 si no existe
-
-### Actualización parcial (PATCH)
-PATCH {{baseUrl}}/api/consultations/{{consultationId}}
-Content-Type: application/json
-
-{
-  "medical_record": "Nota breve actualizada"
-}
-
-# Mantiene doctor_id existente si no se provee
-# Expected: 200 OK con entidad actualizada
-
-### Eliminar consulta por id
-DELETE {{baseUrl}}/api/consultations/{{consultationId}}
-
-# Verifica existencia y devuelve 204 si eliminado
-
+## 10- Delete the second patient (soft delete via POST)
+Invoke-RestMethod -Uri "http://localhost:3000/api/patients/$($pat2.id)/soft-delete" -Method Post -ContentType 'application/json' -Body '{}'
