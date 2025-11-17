@@ -37,7 +37,6 @@ export class ConsultationPostgresRepository implements ConsultationRepository {
   }
 
   async partialUpdate(id: string, updates: Partial<Consultation>): Promise<Consultation | undefined> {
-    // Only allow updating specific columns that exist in the DB
     const allowed = ['patient_id', 'medical_record', 'image', 'deleted_at'];
     const keys = Object.keys(updates as Record<string, unknown>).filter((k) => allowed.includes(k));
     const values = keys.map((k) => (updates as any)[k]);

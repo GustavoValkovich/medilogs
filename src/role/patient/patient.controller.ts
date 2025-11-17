@@ -18,7 +18,6 @@ export class PatientController {
   }
 
   async findAllPatients(req: Request, res: Response) {
-    // Obtener doctor id del cliente si se envía (header 'x-doctor-id', query o body)
     const reqDoctorIdRaw = (req as any).headers?.['x-doctor-id'] ?? (req as any).query?.doctor_id ?? (req as any).body?.doctor_id;
     let doctorId: number | undefined = undefined;
     if (reqDoctorIdRaw !== undefined && reqDoctorIdRaw !== null) {

@@ -79,3 +79,8 @@ src/
 ## Main routes
 
 Routes are organized under `src/role/*`. Open the `*.routes.ts` files inside each folder (`doctor`, `patient`, `consultation`) to see available endpoints and their request/response shapes.
+
+
+## Endpoints test Documentation
+
+To test endpoints, implement the medilogs-api.http curls

@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
 export const rolesRouter = Router();
-// health check
+
 rolesRouter.get('/health', (req, res) => res.json({ ok: true }));
-// sanitization helper
+
 export function sanitizeCharacterInput(req: any, res: any, next: any) {
   req.body.sanitizedInput = {
     name: req.body?.name,

@@ -14,11 +14,10 @@ router.get('/:id', controller.findDoctorById);
 router.post('/', async (req, res) => {
   try {
     const data: Doctor = req.body;
-
-    // Validate required fields according to DB NOT NULL constraints
     const required = ['first_name', 'last_name', 'specialty', 'license_number', 'password'];
     const missing = required.filter((f) => !(f in (data as any)) || (data as any)[f] === undefined || (data as any)[f] === '');
-    if (missing.length > 0) return res.status(400).json({ message: 'Faltan campos requeridos', missing });
+    if (missing.length > 0)
+      return res.status(400).json({ message: 'Faltan campos requeridos', missing });
 
     if (data.password) {
       const salt = await bcrypt.genSalt(10);

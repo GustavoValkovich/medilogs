@@ -47,6 +47,3 @@ docker-data/
 
 # archivos REST Client (si no querés subirlos)
 dist/
-
-# Lock files
-package-lock.json

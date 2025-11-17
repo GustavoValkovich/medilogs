@@ -32,8 +32,6 @@ export class DoctorPostgresRepository implements DoctorRepository {
       );
       return res.rows[0];
     } catch (error) {
-      // Log DB error for debugging (do not expose internals to clients)
-      // eslint-disable-next-line no-console
       console.error('DoctorPostgresRepository.add error:', (error as Error).message || error);
       return undefined;
     }
