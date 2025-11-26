@@ -1,0 +1,306 @@
+# ===================================
+# Testing API de Medilogs
+# ===================================
+# URL Base: http://localhost:3000
+# Descripción: Testing completo de la API backend de Medilogs
+# ===================================
+
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# ===================================
+# HEALTH CHECK BÁSICO
+# ===================================
+
+### Listar doctores (chequear que la API responde)
+GET {{baseUrl}}/api/doctors
+Content-Type: {{contentType}}
+
+###
+
+### Listar pacientes
+GET {{baseUrl}}/api/patients
+Content-Type: {{contentType}}
+
+###
+
+### Listar consultas
+GET {{baseUrl}}/api/consultations
+Content-Type: {{contentType}}
+
+################################################################################
+# SECCIÓN DOCTORES
+################################################################################
+
+### Crear primer doctor (doctor 1)
+POST {{baseUrl}}/api/doctors
+Content-Type: {{contentType}}
+
+{
+  "first_name": "Alberto",
+  "last_name": "López",
+  "specialty": "Clínica Médica",
+  "phone": "341-5550001",
+  "email": "alberto.lopez@example.com",
+  "license_number": "1001",
+  "password": "admin1"
+}
+
+###
+
+### Listar doctores (ver que se creó el doctor 1)
+GET {{baseUrl}}/api/doctors
+Content-Type: {{contentType}}
+
+###
+
+### Buscar doctor 1 por ID
+# Ajustá el ID según lo que devuelva el listado anterior (ej: 1)
+GET {{baseUrl}}/api/doctors/1
+Content-Type: {{contentType}}
+
+###
+
+### Actualizar doctor 1 (PUT completo)
+PUT {{baseUrl}}/api/doctors/1
+Content-Type: {{contentType}}
+
+{
+  "first_name": "Alberto",
+  "last_name": "López",
+  "specialty": "Clínica Médica",
+  "phone": "341-5550002",
+  "email": "alberto.lopez@example.com",
+  "license_number": "1001",
+  "password": "admin1"
+}
+
+###
+
+### Actualizar parcialmente doctor 1 (PATCH)
+PATCH {{baseUrl}}/api/doctors/1
+Content-Type: {{contentType}}
+
+{
+  "phone": "341-5559999"
+}
+
+###
+
+### Eliminar doctor 1 (DELETE)
+DELETE {{baseUrl}}/api/doctors/1
+Content-Type: {{contentType}}
+
+###
+
+### Crear segundo doctor (doctor 2)
+POST {{baseUrl}}/api/doctors
+Content-Type: {{contentType}}
+
+{
+  "first_name": "Diana",
+  "last_name": "García",
+  "specialty": "Pediatría",
+  "phone": "341-5550003",
+  "email": "diana.garcia@example.com",
+  "license_number": "1002",
+  "password": "admin2"
+}
+
+###
+
+### Listar doctores (ver doctor 2)
+GET {{baseUrl}}/api/doctors
+Content-Type: {{contentType}}
+
+###
+
+### Login con doctor 2 (POST /api/doctors/login)
+POST {{baseUrl}}/api/doctors/login
+Content-Type: {{contentType}}
+
+{
+  "email": "diana.garcia@example.com",
+  "password": "admin2"
+}
+
+###
+
+################################################################################
+# SECCIÓN PACIENTES
+################################################################################
+
+### Crear paciente 1 asociado al doctor 2
+# Ajustá doctor_id con el ID real del doctor 2 (ej: 2)
+POST {{baseUrl}}/api/patients
+Content-Type: {{contentType}}
+
+{
+  "doctor_id": 2,
+  "full_name": "Ana Paciente",
+  "document": "37254256",
+  "birth_date": "1985-05-05",
+  "notes": "Paciente de prueba 1",
+  "gender": "F",
+  "insurance": "OSDE",
+  "email": "ana.paciente@example.com",
+  "city": "Rosario"
+}
+
+###
+
+### Crear paciente 2 asociado al doctor 2
+POST {{baseUrl}}/api/patients
+Content-Type: {{contentType}}
+
+{
+  "doctor_id": 2,
+  "full_name": "Carlos Paciente",
+  "document": "30111222",
+  "birth_date": "1990-10-10",
+  "notes": "Paciente de prueba 2",
+  "gender": "M",
+  "insurance": "Swiss Medical",
+  "email": "carlos.paciente@example.com",
+  "city": "Rosario"
+}
+
+###
+
+### Listar todos los pacientes
+GET {{baseUrl}}/api/patients
+Content-Type: {{contentType}}
+
+###
+
+### Buscar paciente 1 por ID
+# Ajustá el ID según lo que devuelve el listado (ej: 1)
+GET {{baseUrl}}/api/patients/1
+Content-Type: {{contentType}}
+
+###
+
+### Actualizar paciente 1 (PUT completo)
+PUT {{baseUrl}}/api/patients/1
+Content-Type: {{contentType}}
+
+{
+  "doctor_id": 2,
+  "full_name": "Ana Paciente Actualizada",
+  "document": "37254256",
+  "birth_date": "1985-05-05",
+  "notes": "Notas actualizadas",
+  "gender": "F",
+  "insurance": "OSDE",
+  "email": "ana.paciente@example.com",
+  "city": "Venado Tuerto"
+}
+
+###
+
+### Actualizar parcialmente paciente 1 (PATCH)
+PATCH {{baseUrl}}/api/patients/1
+Content-Type: {{contentType}}
+
+{
+  "notes": "Notas actualizadas por PATCH",
+  "city": "Rosario Centro"
+}
+
+###
+
+### Soft-delete de paciente 1 (POST /:id/soft-delete)
+POST {{baseUrl}}/api/patients/1/soft-delete
+Content-Type: {{contentType}}
+
+{
+  "deleted_at": "2025-11-17T00:00:00Z"
+}
+
+###
+
+### Restaurar paciente 1 (POST /:id/restore)
+POST {{baseUrl}}/api/patients/1/restore
+Content-Type: {{contentType}}
+
+###
+
+### Eliminar definitivamente paciente 1 (DELETE)
+DELETE {{baseUrl}}/api/patients/1
+Content-Type: {{contentType}}
+
+###
+
+################################################################################
+# SECCIÓN CONSULTAS
+################################################################################
+
+### Crear consulta para el paciente 2
+# Ajustá patient_id al ID real del paciente 2 (ej: 2)
+POST {{baseUrl}}/api/consultations
+Content-Type: {{contentType}}
+
+{
+  "patient_id": 2,
+  "medical_record": "Consulta inicial. Motivo: cefalea recurrente.",
+  "image": null
+}
+
+###
+
+### Listar todas las consultas
+GET {{baseUrl}}/api/consultations
+Content-Type: {{contentType}}
+
+###
+
+### Buscar consulta por ID
+# Ajustá el ID según lo que devolvió el POST o el listado (ej: 1)
+GET {{baseUrl}}/api/consultations/1
+Content-Type: {{contentType}}
+
+###
+
+### Actualizar consulta (PUT completo)
+PUT {{baseUrl}}/api/consultations/1
+Content-Type: {{contentType}}
+
+{
+  "patient_id": 2,
+  "medical_record": "Consulta inicial - actualizado por PUT.",
+  "image": null
+}
+
+###
+
+### Actualizar parcialmente consulta (PATCH)
+PATCH {{baseUrl}}/api/consultations/1
+Content-Type: {{contentType}}
+
+{
+  "medical_record": "Consulta actualizada por PATCH."
+}
+
+###
+
+### Soft-delete de consulta (POST /:id/soft-delete)
+POST {{baseUrl}}/api/consultations/1/soft-delete
+Content-Type: {{contentType}}
+
+{
+  "deleted_at": "2025-11-18T00:00:00Z"
+}
+
+###
+
+### Restaurar consulta (POST /:id/restore)
+POST {{baseUrl}}/api/consultations/1/restore
+Content-Type: {{contentType}}
+
+###
+
+### Eliminar definitivamente consulta (DELETE)
+DELETE {{baseUrl}}/api/consultations/1
+Content-Type: {{contentType}}
+
+###
