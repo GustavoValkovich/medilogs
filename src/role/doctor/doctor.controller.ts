@@ -33,30 +33,28 @@ export class DoctorController {
   }
 
   async addDoctor(req: Request, res: Response) {
-    try {
-      const data: Doctor = req.body;
-      const required = ['first_name', 'last_name', 'specialty', 'license_number', 'password'];
-      const missing = required.filter((f) => !(f in (data as any)) || (data as any)[f] === undefined || (data as any)[f] === '');
-      if (missing.length > 0) return res.status(400).json({ message: 'Faltan campos requeridos', missing });
+  try {
+    const data = Doctor.create(req.body);
 
-      if ((data as any).password) {
-        const salt = await bcrypt.genSalt(10);
-        (data as any).password = await bcrypt.hash((data as any).password, salt);
-      }
+    const salt = await bcrypt.genSalt(10);
+    data.password = await bcrypt.hash(data.password, salt);
 
-      const created = await this.repo.add(data);
-      if (!created) return res.status(500).json({ message: 'No se pudo crear el doctor' });
+    const created = await this.repo.add(data);
+    if (!created) return res.status(500).json({ message: 'No se pudo crear el doctor' });
 
-      const safe = { ...(created as any) };
-      if (safe.password) delete safe.password;
-      return res.status(201).json(safe);
-    } catch (err: any) {
-      if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-        return res.status(409).json({ message: 'El email ya existe' });
-      }
-      return res.status(500).json({ message: 'Error interno al crear doctor' });
+    const safe = { ...(created as any) };
+    if (safe.password) delete safe.password;
+    return res.status(201).json(safe);
+  } catch (err: any) {
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return res.status(409).json({ message: 'El email ya existe' });
     }
+    if (String(err?.message || '').startsWith('INVALID_')) {
+      return res.status(400).json({ message: 'Datos inválidos', code: err.message });
+    }
+    return res.status(500).json({ message: 'Error interno al crear doctor' });
   }
+}
 
   async loginDoctor(req: Request, res: Response) {
     const { email, password } = req.body as { email?: string; password?: string };
@@ -76,28 +74,29 @@ export class DoctorController {
   }
 
   async updateDoctor(req: Request, res: Response) {
-    try {
-      const { id } = req.params;
-      const data: Doctor = req.body;
+  try {
+    const { id } = req.params;
+    const data = Doctor.create(req.body);
 
-      if ((data as any).password) {
-        const salt = await bcrypt.genSalt(10);
-        (data as any).password = await bcrypt.hash((data as any).password, salt);
-      }
+    const salt = await bcrypt.genSalt(10);
+    data.password = await bcrypt.hash(data.password, salt);
 
-      const updated = await this.repo.update(id, data);
-      if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
+    const updated = await this.repo.update(id, data);
+    if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
 
-      const safe = { ...(updated as any) };
-      if (safe.password) delete safe.password;
-      return res.json(safe);
-    } catch (err: any) {
-      if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-        return res.status(409).json({ message: 'El email ya existe' });
-      }
-      return res.status(500).json({ message: 'Error interno al actualizar doctor' });
+    const safe = { ...(updated as any) };
+    if (safe.password) delete safe.password;
+    return res.json(safe);
+  } catch (err: any) {
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return res.status(409).json({ message: 'El email ya existe' });
     }
+    if (String(err?.message || '').startsWith('INVALID_')) {
+      return res.status(400).json({ message: 'Datos inválidos', code: err.message });
+    }
+    return res.status(500).json({ message: 'Error interno al actualizar doctor' });
   }
+}
 
   async partialUpdateDoctor(req: Request, res: Response) {
     try {
