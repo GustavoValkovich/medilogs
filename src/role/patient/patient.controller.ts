@@ -71,10 +71,15 @@ export class PatientController {
     if (!created) return res.status(500).json({ message: 'No se pudo crear el paciente' });
     return res.status(201).json(created);
   } catch (err: any) {
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return res.status(409).json({ message: 'El email ya existe' });
+    }
+
     const code = err?.message || String(err);
     if (String(code).startsWith('INVALID_') || String(code).includes('BIRTH') || String(code).includes('FUTURE')) {
       return res.status(400).json({ message: 'Datos inválidos', code });
     }
+
     console.error('Error creating patient:', err);
     return res.status(500).json({ message: 'Error interno al crear paciente', error: err?.message || String(err) });
   }
@@ -89,11 +94,23 @@ export class PatientController {
     if (!updated) return res.status(404).json({ message: 'Paciente no encontrado o no actualizado' });
     return res.status(200).json(updated);
   } catch (err: any) {
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return res.status(409).json({ message: 'El email ya existe' });
+    }
+
     const code = err?.message || String(err);
-    if (String(code).startsWith('INVALID_') || String(code).includes('BIRTH') || String(code).includes('FUTURE')) {
+    if (
+      String(code).startsWith('INVALID_') ||
+      String(code).includes('BIRTH') ||
+      String(code).includes('FUTURE')
+    ) {
       return res.status(400).json({ message: 'Datos inválidos', code });
     }
-    return res.status(500).json({ message: 'Error interno al actualizar paciente', error: err?.message || String(err) });
+
+    return res.status(500).json({
+      message: 'Error interno al actualizar paciente',
+      error: err?.message || String(err),
+    });
   }
 }
 
