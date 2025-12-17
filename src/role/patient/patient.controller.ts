@@ -1,3 +1,5 @@
+import { Patient } from './patient.entity.js';
+import { DomainError } from './domain-error.js';
 import type { Request, Response } from 'express';
 
 export class PatientController {
@@ -62,26 +64,38 @@ export class PatientController {
     return res.status(200).json(found);
   }
 
-  async addPatient(req: Request, res: Response) {
-    try {
-      const created = await this.repo.add(req.body);
-      if (!created) return res.status(500).json({ message: 'No se pudo crear el paciente' });
-      return res.status(201).json(created);
-    } catch (err: any) {
-      console.error('Error creating patient:', err);
-      return res.status(500).json({
-        message: 'Error interno al crear paciente',
-        error: err?.message || String(err),
-      });
+ async addPatient(req: Request, res: Response) {
+  try {
+    const entity = Patient.create(req.body);
+    const created = await this.repo.add(entity);
+    if (!created) return res.status(500).json({ message: 'No se pudo crear el paciente' });
+    return res.status(201).json(created);
+  } catch (err: any) {
+    const code = err?.message || String(err);
+    if (String(code).startsWith('INVALID_') || String(code).includes('BIRTH') || String(code).includes('FUTURE')) {
+      return res.status(400).json({ message: 'Datos inválidos', code });
     }
+    console.error('Error creating patient:', err);
+    return res.status(500).json({ message: 'Error interno al crear paciente', error: err?.message || String(err) });
   }
+}
 
-  async updatePatient(req: Request, res: Response) {
+
+ async updatePatient(req: Request, res: Response) {
+  try {
     const { id } = req.params;
-    const updated = await this.repo.update(id, req.body);
+    const entity = Patient.create(req.body);
+    const updated = await this.repo.update(id, entity);
     if (!updated) return res.status(404).json({ message: 'Paciente no encontrado o no actualizado' });
     return res.status(200).json(updated);
+  } catch (err: any) {
+    const code = err?.message || String(err);
+    if (String(code).startsWith('INVALID_') || String(code).includes('BIRTH') || String(code).includes('FUTURE')) {
+      return res.status(400).json({ message: 'Datos inválidos', code });
+    }
+    return res.status(500).json({ message: 'Error interno al actualizar paciente', error: err?.message || String(err) });
   }
+}
 
   async partialUpdatePatient(req: Request, res: Response) {
     const { id } = req.params;
