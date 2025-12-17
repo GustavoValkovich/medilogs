@@ -1,5 +1,5 @@
 import { pool } from "../../db/connection.js";
-import { Consultation } from "./consultation.entity.js";
+import Consultation from "./consultation.entity";
 import { ConsultationRepository } from "./consultation.repository.interface.js";
 
 export class ConsultationPostgresRepository implements ConsultationRepository {

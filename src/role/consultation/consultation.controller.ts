@@ -1,3 +1,4 @@
+import { Consultation } from './consultation.entity';
 import type { Request, Response } from 'express';
 
 export class ConsultationController {
@@ -27,30 +28,46 @@ export class ConsultationController {
     return res.status(200).json(item);
   }
 
-  async addConsultation(req: Request, res: Response) {
-    const data = req.body;
-    const patientId = data?.patient_id;
-    if (!patientId) return res.status(400).json({ message: 'patient_id es requerido' });
+async addConsultation(req: Request, res: Response) {
+  try {
+    const entity = Consultation.create(req.body);
 
-    const patient = await this.patientRepo.findOne(String(patientId));
+    const patient = await this.patientRepo.findOne(String(entity.patient_id));
     if (!patient) return res.status(404).json({ message: 'Paciente no encontrado' });
 
-    const created = await this.repo.add(data);
+    const created = await this.repo.add(entity);
     if (!created) return res.status(500).json({ message: 'No se pudo crear la consulta' });
     return res.status(201).json(created);
+  } catch (err: any) {
+    const code = err?.message || String(err);
+    if (String(code).startsWith('INVALID_')) {
+      return res.status(400).json({ message: 'Datos inválidos', code });
+    }
+    return res.status(500).json({ message: 'Error interno al crear la consulta' });
   }
+}
 
-  async updateConsultation(req: Request, res: Response) {
+
+ async updateConsultation(req: Request, res: Response) {
+  try {
     const { id } = req.params;
-    const data = req.body;
+    const entity = Consultation.create(req.body);
 
     const existing = await this.repo.findOne(id);
     if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
 
-    const updated = await this.repo.update(id, data);
+    const updated = await this.repo.update(id, entity);
     if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o no actualizada' });
     return res.status(200).json(updated);
+  } catch (err: any) {
+    const code = err?.message || String(err);
+    if (String(code).startsWith('INVALID_')) {
+      return res.status(400).json({ message: 'Datos inválidos', code });
+    }
+    return res.status(500).json({ message: 'Error interno al actualizar la consulta' });
   }
+}
+
 
   async partialUpdateConsultation(req: Request, res: Response) {
     const { id } = req.params;

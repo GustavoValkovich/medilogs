@@ -3,6 +3,7 @@ import { ConsultationPostgresRepository } from './consultation.postgres.reposito
 import { PatientPostgresRepository } from '../patient/patient.postgres.repository.js';
 import { ConsultationController } from './consultation.controller.js';
 
+
 const router = express.Router();
 
 const repo = new ConsultationPostgresRepository();
