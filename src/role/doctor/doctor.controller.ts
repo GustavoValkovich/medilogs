@@ -1,62 +1,138 @@
 import type { Request, Response } from 'express';
-import type { Doctor } from './doctor.entity.js';
-import type { DoctorRepository } from './doctor.repository.interface.js';
+import bcrypt from 'bcryptjs';
+import { Doctor } from './doctor.entity.js';
 
 export class DoctorController {
-  private doctorRepository: DoctorRepository;
-
-  constructor(doctorRepository: DoctorRepository) {
-    this.doctorRepository = doctorRepository;
+  constructor(private repo: any) {
     this.findAllDoctors = this.findAllDoctors.bind(this);
     this.findDoctorById = this.findDoctorById.bind(this);
     this.addDoctor = this.addDoctor.bind(this);
+    this.loginDoctor = this.loginDoctor.bind(this);
     this.updateDoctor = this.updateDoctor.bind(this);
     this.partialUpdateDoctor = this.partialUpdateDoctor.bind(this);
     this.deleteDoctor = this.deleteDoctor.bind(this);
   }
 
-  async findAllDoctors(_req: Request, res: Response) {
-    const items = await this.doctorRepository.findAll();
-    return res.status(200).json(items || []);
+  async findAllDoctors(req: Request, res: Response) {
+    const items = await this.repo.findAll();
+    const safe = (items ?? []).map((d: any) => {
+      const x = { ...d };
+      if (x.password) delete x.password;
+      return x;
+    });
+    return res.status(200).json(safe);
   }
 
   async findDoctorById(req: Request, res: Response) {
     const { id } = req.params;
-    const item = await this.doctorRepository.findOne(id);
-    if (!item) return res.status(404).json({ message: 'Doctor no encontrado' });
-    return res.status(200).json(item);
+    const found = await this.repo.findOne(id);
+    if (!found) return res.status(404).json({ message: 'Doctor no encontrado' });
+    const safe = { ...(found as any) };
+    if (safe.password) delete safe.password;
+    return res.status(200).json(safe);
   }
 
   async addDoctor(req: Request, res: Response) {
-    const data = req.body as Doctor;
-    const created = await this.doctorRepository.add(data);
+  try {
+    const data = Doctor.create(req.body);
+
+    const salt = await bcrypt.genSalt(10);
+    data.password = await bcrypt.hash(data.password, salt);
+
+    const created = await this.repo.add(data);
     if (!created) return res.status(500).json({ message: 'No se pudo crear el doctor' });
-    if ((created as any).password) delete (created as any).password;
-    return res.status(201).json(created);
+
+    const safe = { ...(created as any) };
+    if (safe.password) delete safe.password;
+    return res.status(201).json(safe);
+  } catch (err: any) {
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return res.status(409).json({ message: 'El email ya existe' });
+    }
+    if (String(err?.message || '').startsWith('INVALID_')) {
+      return res.status(400).json({ message: 'Datos inválidos', code: err.message });
+    }
+    return res.status(500).json({ message: 'Error interno al crear doctor' });
+  }
+}
+
+  async loginDoctor(req: Request, res: Response) {
+    const { email, password } = req.body as { email?: string; password?: string };
+    if (!email || !password) return res.status(400).json({ message: 'Email y password requeridos' });
+
+    const all = await this.repo.findAll();
+    const user = (all || []).find((d: any) => d?.email === email);
+    if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
+
+    const hashed = (user as any).password;
+    const match = hashed ? await bcrypt.compare(password, hashed) : false;
+    if (!match) return res.status(401).json({ message: 'Credenciales inválidas' });
+
+    const result = { ...(user as any) };
+    if (result.password) delete result.password;
+    return res.json({ user: result });
   }
 
   async updateDoctor(req: Request, res: Response) {
+  try {
     const { id } = req.params;
-    const data = req.body as Doctor;
-    const updated = await this.doctorRepository.update(id, data);
+    const data = Doctor.create(req.body);
+
+    const salt = await bcrypt.genSalt(10);
+    data.password = await bcrypt.hash(data.password, salt);
+
+    const updated = await this.repo.update(id, data);
     if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
-    if ((updated as any).password) delete (updated as any).password;
-    return res.status(200).json(updated);
+
+    const safe = { ...(updated as any) };
+    if (safe.password) delete safe.password;
+    return res.json(safe);
+  } catch (err: any) {
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return res.status(409).json({ message: 'El email ya existe' });
+    }
+    if (String(err?.message || '').startsWith('INVALID_')) {
+      return res.status(400).json({ message: 'Datos inválidos', code: err.message });
+    }
+    return res.status(500).json({ message: 'Error interno al actualizar doctor' });
   }
+}
 
   async partialUpdateDoctor(req: Request, res: Response) {
-    const { id } = req.params;
-    const updates = req.body as Partial<Doctor>;
-    const updated = await this.doctorRepository.partialUpdate(id, updates);
-    if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
-    if ((updated as any).password) delete (updated as any).password;
-    return res.status(200).json(updated);
+    try {
+      const { id } = req.params;
+      const updates = req.body as Partial<Doctor>;
+
+      const allowed = ['first_name','last_name','specialty','phone','email','license_number','password'];
+      const keys = Object.keys(updates).filter((k) => allowed.includes(k));
+      if (keys.length === 0) return res.status(400).json({ message: 'No hay campos actualizables' });
+
+      if ((updates as any).password) {
+        const salt = await bcrypt.genSalt(10);
+        (updates as any).password = await bcrypt.hash((updates as any).password, salt);
+      }
+
+      const filtered: Partial<Doctor> = {};
+      keys.forEach((k) => ((filtered as any)[k] = (updates as any)[k]));
+
+      const updated = await this.repo.partialUpdate(id, filtered);
+      if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
+
+      const safe = { ...(updated as any) };
+      if (safe.password) delete safe.password;
+      return res.json(safe);
+    } catch (err: any) {
+      if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+        return res.status(409).json({ message: 'El email ya existe' });
+      }
+      return res.status(500).json({ message: 'Error interno al actualizar doctor' });
+    }
   }
 
   async deleteDoctor(req: Request, res: Response) {
     const { id } = req.params;
-    const ok = await this.doctorRepository.delete(id);
-    if (!ok) return res.status(404).json({ message: 'Doctor no encontrado' });
+    const deleted = await this.repo.delete(id);
+    if (!deleted) return res.status(404).json({ message: 'Doctor no encontrado' });
     return res.status(204).send();
   }
 }

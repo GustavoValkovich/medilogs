@@ -17,8 +17,10 @@ export class PatientPostgresRepository implements PatientRepository {
     return result.rows[0];
   }
 
-  async add(patient: Patient): Promise<Patient | undefined> {
-    const { doctor_id, full_name, document, birth_date, notes, gender, insurance, email, city } = patient;
+async add(patient: Patient): Promise<Patient | undefined> {
+  const { doctor_id, full_name, document, birth_date, notes, gender, insurance, email, city } = patient;
+
+  try {
     const result = await pool.query(
       `INSERT INTO patients (doctor_id, full_name, document, birth_date, notes, gender, insurance, email, city)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
@@ -26,7 +28,16 @@ export class PatientPostgresRepository implements PatientRepository {
       [doctor_id, full_name, document, birth_date, notes, gender, insurance, email, city]
     );
     return result.rows[0];
+  } catch (err: any) {
+    if (err?.code === '23505') {
+      const e = new Error('DUPLICATE_EMAIL');
+      (e as any).httpStatus = 409;
+      throw e;
+    }
+    throw err;
   }
+}
+
 
   async update(id: string, patient: Patient): Promise<Patient | undefined> {
     const { doctor_id, full_name, document, birth_date, notes, gender, insurance, email, city } = patient;
