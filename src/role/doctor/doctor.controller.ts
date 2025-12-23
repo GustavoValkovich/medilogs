@@ -40,19 +40,19 @@ export class DoctorController {
     data.password = await bcrypt.hash(data.password, salt);
 
     const created = await this.repo.add(data);
-    if (!created) return res.status(500).json({ message: 'No se pudo crear el doctor' });
+    if (!created) return res.status(500).json({ message: 'Error interno' });
 
     const safe = { ...(created as any) };
     if (safe.password) delete safe.password;
     return res.status(201).json(safe);
   } catch (err: any) {
-    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-      return res.status(409).json({ message: 'El email ya existe' });
-    }
-    if (String(err?.message || '').startsWith('INVALID_')) {
-      return res.status(400).json({ message: 'Datos inválidos', code: err.message });
-    }
-    return res.status(500).json({ message: 'Error interno al crear doctor' });
+  if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+    return res.status(409).json({ message: 'El email ya existe', code: 'DUPLICATE_EMAIL' });
+  }
+  if (String(err?.message || '').startsWith('INVALID_')) {
+    return res.status(400).json({ message: 'Datos inválidos', code: err.message });
+  }
+  return res.status(500).json({ message: 'Error interno al crear doctor' });
   }
 }
 
@@ -88,14 +88,14 @@ export class DoctorController {
     if (safe.password) delete safe.password;
     return res.json(safe);
   } catch (err: any) {
-    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-      return res.status(409).json({ message: 'El email ya existe' });
-    }
-    if (String(err?.message || '').startsWith('INVALID_')) {
-      return res.status(400).json({ message: 'Datos inválidos', code: err.message });
-    }
-    return res.status(500).json({ message: 'Error interno al actualizar doctor' });
+  if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+    return res.status(409).json({ message: 'El email ya existe', code: 'DUPLICATE_EMAIL' });
   }
+  if (String(err?.message || '').startsWith('INVALID_')) {
+    return res.status(400).json({ message: 'Datos inválidos', code: err.message });
+  }
+  return res.status(500).json({ message: 'Error interno al actualizar doctor' });
+   }
 }
 
   async partialUpdateDoctor(req: Request, res: Response) {
@@ -122,11 +122,20 @@ export class DoctorController {
       if (safe.password) delete safe.password;
       return res.json(safe);
     } catch (err: any) {
-      if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-        return res.status(409).json({ message: 'El email ya existe' });
-      }
-      return res.status(500).json({ message: 'Error interno al actualizar doctor' });
-    }
+  if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+    return res.status(409).json({
+      message: 'El email ya existe',
+      code: 'DUPLICATE_EMAIL',
+    });
+  }
+  if (String(err?.message || '').startsWith('INVALID_')) {
+    return res.status(400).json({
+      message: 'Datos inválidos',
+      code: err.message,
+    });
+  }
+  return res.status(500).json({ message: 'Error interno al actualizar doctor' });
+ }
   }
 
   async deleteDoctor(req: Request, res: Response) {
