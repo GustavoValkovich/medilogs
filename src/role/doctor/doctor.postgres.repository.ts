@@ -40,7 +40,7 @@ export class DoctorPostgresRepository implements DoctorRepository {
   }
 
   console.error('DoctorPostgresRepository.add error:', error?.message || error);
-  throw error; // <-- NO devolver undefined, propagamos el error
+  throw error; 
 }
   }
 
