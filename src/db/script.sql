@@ -70,3 +70,9 @@ CREATE TRIGGER update_consultations_updated_at
   BEFORE UPDATE ON consultations
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
+
+ALTER TABLE doctors
+ADD CONSTRAINT doctors_email_unique UNIQUE (email);
+
+ALTER TABLE patients
+ADD CONSTRAINT patients_email_unique UNIQUE (email);

@@ -31,10 +31,17 @@ export class DoctorPostgresRepository implements DoctorRepository {
         ],
       );
       return res.rows[0];
-    } catch (error) {
-      console.error('DoctorPostgresRepository.add error:', (error as Error).message || error);
-      return undefined;
-    }
+    }  catch (error: any) {
+  
+  if (error?.code === '23505') {
+    const e = new Error('DUPLICATE_EMAIL');
+    (e as any).httpStatus = 409;
+    throw e;
+  }
+
+  console.error('DoctorPostgresRepository.add error:', error?.message || error);
+  throw error; 
+}
   }
 
   async update(id: string, doctor: Doctor): Promise<Doctor | undefined> {
@@ -57,10 +64,15 @@ export class DoctorPostgresRepository implements DoctorRepository {
         ],
       );
       return res.rows[0];
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('DoctorPostgresRepository.update error:', (error as Error).message || error);
-      return undefined;
+    } catch (error: any) {
+  if (error?.code === '23505') {
+    const e = new Error('DUPLICATE_EMAIL');
+    (e as any).httpStatus = 409;
+    throw e;
+  }
+
+  console.error('DoctorPostgresRepository.update error:', error?.message || error);
+  throw error;
     }
   }
 
@@ -76,11 +88,16 @@ export class DoctorPostgresRepository implements DoctorRepository {
 
       const res = await pool.query(query, [...values, id]);
       return res.rows[0];
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('DoctorPostgresRepository.partialUpdate error:', (error as Error).message || error);
-      return undefined;
-    }
+    } catch (error: any) {
+  if (error?.code === '23505') {
+    const e = new Error('DUPLICATE_EMAIL');
+    (e as any).httpStatus = 409;
+    throw e;
+  }
+
+  console.error('DoctorPostgresRepository.partialUpdate error:', error?.message || error);
+  throw error;
+}
   }
 
   async delete(id: string): Promise<Doctor | undefined> {
@@ -88,9 +105,8 @@ export class DoctorPostgresRepository implements DoctorRepository {
       const res = await pool.query('DELETE FROM doctors WHERE id = $1 RETURNING *', [id]);
       return res.rows[0];
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('DoctorPostgresRepository.delete error:', (error as Error).message || error);
-      return undefined;
+  console.error('DoctorPostgresRepository.delete error:', error);
+  throw error;
     }
   }
 }

@@ -1,4 +1,4 @@
-import { Consultation } from './consultation.entity';
+import { Consultation } from './consultation.entity.js';
 import type { Request, Response } from 'express';
 
 export class ConsultationController {
