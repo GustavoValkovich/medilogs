@@ -1,6 +1,6 @@
 import { Patient } from './patient.entity.js';
 import { DomainError } from './domain-error.js';
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 export class PatientController {
   constructor(private repo: {
@@ -64,7 +64,7 @@ export class PatientController {
     return res.status(200).json(found);
   }
 
- async addPatient(req: Request, res: Response) {
+ async addPatient(req: Request, res: Response, next: NextFunction) {
   try {
     const entity = Patient.create(req.body);
     const created = await this.repo.add(entity);
@@ -85,8 +85,7 @@ export class PatientController {
   }
 }
 
-
- async updatePatient(req: Request, res: Response) {
+ async updatePatient(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
     const entity = Patient.create(req.body);

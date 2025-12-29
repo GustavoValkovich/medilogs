@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { HttpError } from './http-error.js';
+import { DomainError } from '../role/patient/domain-error.js';
 
 export function errorMiddleware(err: any, req: Request, res: Response, next: NextFunction) {
   if (err instanceof HttpError) {
@@ -9,6 +10,13 @@ export function errorMiddleware(err: any, req: Request, res: Response, next: Nex
       details: err.details,
     });
   }
+
+  if (err instanceof DomainError) {
+  return res.status(err.status ?? 400).json({
+    message: err.message,
+    code: err.code,
+  });
+}
 
   if (err?.code === '23505') {
     return res.status(409).json({
