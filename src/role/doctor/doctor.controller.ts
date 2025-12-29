@@ -1,6 +1,7 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import bcrypt from 'bcryptjs';
 import { Doctor } from './doctor.entity.js';
+import { HttpError } from '../../shared/http-error.js';
 
 export class DoctorController {
   constructor(private repo: any) {
@@ -32,7 +33,7 @@ export class DoctorController {
     return res.status(200).json(safe);
   }
 
-  async addDoctor(req: Request, res: Response) {
+async addDoctor(req: Request, res: Response, next: NextFunction) {
   try {
     const data = Doctor.create(req.body);
 
@@ -40,19 +41,27 @@ export class DoctorController {
     data.password = await bcrypt.hash(data.password, salt);
 
     const created = await this.repo.add(data);
-    if (!created) return res.status(500).json({ message: 'Error interno' });
+    if (!created) {
+      throw new HttpError(500, 'Error interno al crear doctor');
+    }
 
     const safe = { ...(created as any) };
     if (safe.password) delete safe.password;
+
     return res.status(201).json(safe);
   } catch (err: any) {
-  if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-    return res.status(409).json({ message: 'El email ya existe', code: 'DUPLICATE_EMAIL' });
-  }
-  if (String(err?.message || '').startsWith('INVALID_')) {
-    return res.status(400).json({ message: 'Datos inválidos', code: err.message });
-  }
-  return res.status(500).json({ message: 'Error interno al crear doctor' });
+    
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return next(new HttpError(409, 'El email ya existe', 'DUPLICATE_EMAIL'));
+    }
+
+    
+    if (String(err?.message || '').startsWith('INVALID_')) {
+      return next(new HttpError(400, 'Datos inválidos', err.message));
+    }
+    
+    
+    return next(err);
   }
 }
 
