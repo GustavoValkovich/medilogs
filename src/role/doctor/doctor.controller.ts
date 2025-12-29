@@ -82,7 +82,7 @@ async addDoctor(req: Request, res: Response, next: NextFunction) {
     return res.json({ user: result });
   }
 
-  async updateDoctor(req: Request, res: Response) {
+  async updateDoctor(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
     const data = Doctor.create(req.body);
@@ -91,23 +91,29 @@ async addDoctor(req: Request, res: Response, next: NextFunction) {
     data.password = await bcrypt.hash(data.password, salt);
 
     const updated = await this.repo.update(id, data);
-    if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
+    if (!updated) {
+      throw new HttpError(404, 'Doctor no encontrado');
+    }
 
     const safe = { ...(updated as any) };
     if (safe.password) delete safe.password;
-    return res.json(safe);
+
+    return res.status(200).json(safe);
   } catch (err: any) {
-  if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-    return res.status(409).json({ message: 'El email ya existe', code: 'DUPLICATE_EMAIL' });
+    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
+      return next(new HttpError(409, 'El email ya existe', 'DUPLICATE_EMAIL'));
+    }
+
+    if (String(err?.message || '').startsWith('INVALID_')) {
+      return next(new HttpError(400, 'Datos inválidos', err.message));
+    }
+
+    return next(err);
   }
-  if (String(err?.message || '').startsWith('INVALID_')) {
-    return res.status(400).json({ message: 'Datos inválidos', code: err.message });
-  }
-  return res.status(500).json({ message: 'Error interno al actualizar doctor' });
-   }
 }
 
-  async partialUpdateDoctor(req: Request, res: Response) {
+
+  async partialUpdateDoctor(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const updates = req.body as Partial<Doctor>;
@@ -132,19 +138,16 @@ async addDoctor(req: Request, res: Response, next: NextFunction) {
       return res.json(safe);
     } catch (err: any) {
   if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-    return res.status(409).json({
-      message: 'El email ya existe',
-      code: 'DUPLICATE_EMAIL',
-    });
+    return next(new HttpError(409, 'El email ya existe', 'DUPLICATE_EMAIL'));
   }
+
   if (String(err?.message || '').startsWith('INVALID_')) {
-    return res.status(400).json({
-      message: 'Datos inválidos',
-      code: err.message,
-    });
+    return next(new HttpError(400, 'Datos inválidos', err.message));
   }
-  return res.status(500).json({ message: 'Error interno al actualizar doctor' });
- }
+
+  return next(err);
+}
+
   }
 
   async deleteDoctor(req: Request, res: Response) {
