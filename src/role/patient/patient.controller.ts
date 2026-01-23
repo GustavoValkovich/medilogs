@@ -1,6 +1,6 @@
 import { Patient } from './patient.entity.js';
-import { DomainError } from './domain-error.js';
 import type { Request, Response, NextFunction } from 'express';
+import { HttpError } from '../../shared/http-error.js';
 
 export class PatientController {
   constructor(private repo: {
@@ -67,49 +67,27 @@ export class PatientController {
  async addPatient(req: Request, res: Response, next: NextFunction) {
   try {
     const entity = Patient.create(req.body);
+
     const created = await this.repo.add(entity);
-    if (!created) return res.status(500).json({ message: 'No se pudo crear el paciente' });
+    if (!created) throw new HttpError(500, 'No se pudo crear el paciente');
+
     return res.status(201).json(created);
-  } catch (err: any) {
-    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-      return res.status(409).json({ message: 'El email ya existe' });
-    }
-
-    const code = err?.message || String(err);
-    if (String(code).startsWith('INVALID_') || String(code).includes('BIRTH') || String(code).includes('FUTURE')) {
-      return res.status(400).json({ message: 'Datos inválidos', code });
-    }
-
-    console.error('Error creating patient:', err);
-    return res.status(500).json({ message: 'Error interno al crear paciente', error: err?.message || String(err) });
+  } catch (err) {
+    return next(err);
   }
 }
 
- async updatePatient(req: Request, res: Response, next: NextFunction) {
+async updatePatient(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
     const entity = Patient.create(req.body);
+
     const updated = await this.repo.update(id, entity);
-    if (!updated) return res.status(404).json({ message: 'Paciente no encontrado o no actualizado' });
+    if (!updated) throw new HttpError(404, 'Paciente no encontrado o no actualizado');
+
     return res.status(200).json(updated);
-  } catch (err: any) {
-    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-      return res.status(409).json({ message: 'El email ya existe' });
-    }
-
-    const code = err?.message || String(err);
-    if (
-      String(code).startsWith('INVALID_') ||
-      String(code).includes('BIRTH') ||
-      String(code).includes('FUTURE')
-    ) {
-      return res.status(400).json({ message: 'Datos inválidos', code });
-    }
-
-    return res.status(500).json({
-      message: 'Error interno al actualizar paciente',
-      error: err?.message || String(err),
-    });
+  } catch (err) {
+    return next(err);
   }
 }
 
