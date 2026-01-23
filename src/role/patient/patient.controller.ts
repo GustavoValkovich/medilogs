@@ -132,45 +132,53 @@ async updatePatient(req: Request, res: Response, next: NextFunction) {
 }
 
 
-  async deletePatient(req: Request, res: Response) {
+  async deletePatient(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
     const ok = await this.repo.delete(id);
-    if (!ok) return res.status(404).json({ message: 'Paciente no encontrado' });
-    return res.status(204).send();
-  }
 
-  async softDeletePatient(req: Request, res: Response) {
+    if (!ok) {
+      throw new HttpError(404, 'Paciente no encontrado', 'PATIENT_NOT_FOUND');
+    }
+
+    return res.status(204).send();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+ async softDeletePatient(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
     const { deleted_at } = req.body as { deleted_at?: string };
 
-    try {
-      const updated = await this.repo.softDelete(id, deleted_at);
-      if (!updated) return res.status(404).json({ message: 'Paciente no encontrado o ya eliminado' });
-      return res.json(updated);
-    } catch (err: any) {
-      console.error('Error soft-deleting patient:', err);
-      return res.status(500).json({
-        message: 'Error interno al eliminar paciente',
-        error: err?.message || String(err),
-      });
+    const updated = await this.repo.softDelete(id, deleted_at);
+    if (!updated) {
+      throw new HttpError(404, 'Paciente no encontrado o ya eliminado', 'PATIENT_NOT_FOUND_OR_DELETED');
     }
-  }
 
-  async restorePatient(req: Request, res: Response) {
+    return res.status(200).json(updated);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+
+  async restorePatient(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
 
-    try {
-      const restored = await this.repo.restore(id);
-      if (!restored) return res.status(404).json({ message: 'Paciente no encontrado o no eliminado' });
-      return res.json(restored);
-    } catch (err: any) {
-      console.error('Error restoring patient:', err);
-      return res.status(500).json({
-        message: 'Error interno al restaurar paciente',
-        error: err?.message || String(err),
-      });
+    const restored = await this.repo.restore(id);
+    if (!restored) {
+      throw new HttpError(404, 'Paciente no encontrado o no eliminado', 'PATIENT_NOT_FOUND_OR_NOT_DELETED');
     }
+
+    return res.status(200).json(restored);
+  } catch (err) {
+    return next(err);
   }
+}
+
 }
 
 export default PatientController;
