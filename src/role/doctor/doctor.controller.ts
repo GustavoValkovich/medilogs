@@ -24,46 +24,44 @@ export class DoctorController {
     return res.status(200).json(safe);
   }
 
-  async findDoctorById(req: Request, res: Response) {
+  async findDoctorById(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
     const found = await this.repo.findOne(id);
-    if (!found) return res.status(404).json({ message: 'Doctor no encontrado' });
+
+    if (!found) {
+      throw new HttpError(404, 'Doctor no encontrado', 'DOCTOR_NOT_FOUND');
+    }
+
     const safe = { ...(found as any) };
     if (safe.password) delete safe.password;
-    return res.status(200).json(safe);
-  }
 
-async addDoctor(req: Request, res: Response, next: NextFunction) {
-  try {
+    return res.status(200).json(safe);
+  } catch (err) {
+    return next(err);
+  }
+}
+
+
+  async addDoctor(req: Request, res: Response, next: NextFunction) {
+    try {
     const data = Doctor.create(req.body);
 
     const salt = await bcrypt.genSalt(10);
     data.password = await bcrypt.hash(data.password, salt);
 
     const created = await this.repo.add(data);
-    if (!created) {
-      throw new HttpError(500, 'Error interno al crear doctor');
-    }
+    if (!created) throw new HttpError(500, 'Error interno al crear doctor');
 
     const safe = { ...(created as any) };
     if (safe.password) delete safe.password;
 
     return res.status(201).json(safe);
-  } catch (err: any) {
-    
-    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-      return next(new HttpError(409, 'El email ya existe', 'DUPLICATE_EMAIL'));
-    }
-
-    
-    if (String(err?.message || '').startsWith('INVALID_')) {
-      return next(new HttpError(400, 'Datos inválidos', err.message));
-    }
-    
-    
+  } catch (err) {
     return next(err);
   }
 }
+
 
 async loginDoctor(req: Request, res: Response, next: NextFunction) {
   try {
@@ -104,26 +102,17 @@ async loginDoctor(req: Request, res: Response, next: NextFunction) {
 
     const updated = await this.repo.update(id, data);
     if (!updated) {
-      throw new HttpError(404, 'Doctor no encontrado');
+      throw new HttpError(404, 'Doctor no encontrado', 'DOCTOR_NOT_FOUND');
     }
 
     const safe = { ...(updated as any) };
     if (safe.password) delete safe.password;
 
     return res.status(200).json(safe);
-  } catch (err: any) {
-    if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-      return next(new HttpError(409, 'El email ya existe', 'DUPLICATE_EMAIL'));
-    }
-
-    if (String(err?.message || '').startsWith('INVALID_')) {
-      return next(new HttpError(400, 'Datos inválidos', err.message));
-    }
-
+  } catch (err) {
     return next(err);
   }
 }
-
 
   async partialUpdateDoctor(req: Request, res: Response, next: NextFunction) {
   try {
