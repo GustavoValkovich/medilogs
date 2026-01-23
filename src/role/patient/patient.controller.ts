@@ -95,21 +95,42 @@ async updatePatient(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-  async partialUpdatePatient(req: Request, res: Response) {
+  async partialUpdatePatient(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
     const updates = (req.body ?? {}) as Record<string, any>;
 
-    const allowed = ['doctor_id','full_name','document','birth_date','notes','gender','insurance','email','city'];
+    const allowed = [
+      'doctor_id',
+      'full_name',
+      'document',
+      'birth_date',
+      'notes',
+      'gender',
+      'insurance',
+      'email',
+      'city',
+    ];
+
     const keys = Object.keys(updates).filter((k) => allowed.includes(k));
-    if (keys.length === 0) return res.status(400).json({ message: 'No hay campos actualizables' });
+    if (keys.length === 0) {
+      throw new HttpError(400, 'No hay campos actualizables', 'NO_UPDATABLE_FIELDS');
+    }
 
     const filtered: Record<string, any> = {};
     keys.forEach((k) => (filtered[k] = updates[k]));
 
     const updated = await this.repo.partialUpdate(id, filtered);
-    if (!updated) return res.status(404).json({ message: 'Paciente no encontrado o no actualizado' });
+    if (!updated) {
+      throw new HttpError(404, 'Paciente no encontrado', 'PATIENT_NOT_FOUND');
+    }
+
     return res.status(200).json(updated);
+  } catch (err) {
+    return next(err);
   }
+}
+
 
   async deletePatient(req: Request, res: Response) {
     const { id } = req.params;
