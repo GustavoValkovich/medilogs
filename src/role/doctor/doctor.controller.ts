@@ -126,48 +126,53 @@ async loginDoctor(req: Request, res: Response, next: NextFunction) {
 
 
   async partialUpdateDoctor(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { id } = req.params;
-      const updates = req.body as Partial<Doctor>;
+  try {
+    const { id } = req.params;
+    const updates = req.body as Partial<Doctor>;
 
-      const allowed = ['first_name','last_name','specialty','phone','email','license_number','password'];
-      const keys = Object.keys(updates).filter((k) => allowed.includes(k));
-      if (keys.length === 0) return res.status(400).json({ message: 'No hay campos actualizables' });
+    const allowed = ['first_name', 'last_name', 'specialty', 'phone', 'email', 'license_number', 'password'];
+    const keys = Object.keys(updates).filter((k) => allowed.includes(k));
 
-      if ((updates as any).password) {
-        const salt = await bcrypt.genSalt(10);
-        (updates as any).password = await bcrypt.hash((updates as any).password, salt);
-      }
+    if (keys.length === 0) {
+      throw new HttpError(400, 'No hay campos actualizables', 'NO_UPDATABLE_FIELDS');
+    }
 
-      const filtered: Partial<Doctor> = {};
-      keys.forEach((k) => ((filtered as any)[k] = (updates as any)[k]));
+    if ((updates as any).password) {
+      const salt = await bcrypt.genSalt(10);
+      (updates as any).password = await bcrypt.hash((updates as any).password, salt);
+    }
 
-      const updated = await this.repo.partialUpdate(id, filtered);
-      if (!updated) return res.status(404).json({ message: 'Doctor no encontrado o no actualizado' });
+    const filtered: Partial<Doctor> = {};
+    keys.forEach((k) => ((filtered as any)[k] = (updates as any)[k]));
 
-      const safe = { ...(updated as any) };
-      if (safe.password) delete safe.password;
-      return res.json(safe);
-    } catch (err: any) {
-  if (err?.message === 'DUPLICATE_EMAIL' || err?.httpStatus === 409) {
-    return next(new HttpError(409, 'El email ya existe', 'DUPLICATE_EMAIL'));
+    const updated = await this.repo.partialUpdate(id, filtered);
+    if (!updated) {
+      throw new HttpError(404, 'Doctor no encontrado', 'DOCTOR_NOT_FOUND');
+    }
+
+    const safe = { ...(updated as any) };
+    if (safe.password) delete safe.password;
+
+    return res.status(200).json(safe);
+  } catch (err) {
+    return next(err); // ✅ duplicados/invalid_* los traduce el middleware global
   }
-
-  if (String(err?.message || '').startsWith('INVALID_')) {
-    return next(new HttpError(400, 'Datos inválidos', err.message));
-  }
-
-  return next(err);
 }
 
-  }
-
-  async deleteDoctor(req: Request, res: Response) {
+  async deleteDoctor(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
     const deleted = await this.repo.delete(id);
-    if (!deleted) return res.status(404).json({ message: 'Doctor no encontrado' });
+
+    if (!deleted) {
+      throw new HttpError(404, 'Doctor no encontrado', 'DOCTOR_NOT_FOUND');
+    }
+
     return res.status(204).send();
+  } catch (err) {
+    return next(err);
   }
+}
 }
 
 export default DoctorController;
