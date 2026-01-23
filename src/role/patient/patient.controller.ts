@@ -39,11 +39,16 @@ export class PatientController {
     return res.status(200).json(items ?? []);
   }
 
-  async findPatientById(req: Request, res: Response) {
+  async findPatientById(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
-    const found = await this.repo.findOne(id);
-    if (!found) return res.status(404).json({ message: 'Paciente no encontrado' });
 
+    const found = await this.repo.findOne(id);
+    if (!found) {
+      throw new HttpError(404, 'Paciente no encontrado', 'PATIENT_NOT_FOUND');
+    }
+
+    
     const reqDoctorIdRaw =
       (req as any).headers?.['x-doctor-id'] ??
       (req as any).query?.doctor_id ??
@@ -51,18 +56,17 @@ export class PatientController {
 
     if (reqDoctorIdRaw !== undefined && reqDoctorIdRaw !== null) {
       const reqDoctorId = Number(reqDoctorIdRaw);
-      if (
-        found.doctor_id !== undefined &&
-        found.doctor_id !== null &&
-        !Number.isNaN(reqDoctorId) &&
-        reqDoctorId !== Number(found.doctor_id)
-      ) {
-        return res.status(403).json({ message: 'Acceso denegado: paciente perteneciente a otro doctor' });
+      if (!Number.isNaN(reqDoctorId) && Number(found.doctor_id) !== reqDoctorId) {
+        throw new HttpError(403, 'Acceso denegado', 'FORBIDDEN_PATIENT');
       }
     }
 
     return res.status(200).json(found);
+  } catch (err) {
+    return next(err);
   }
+}
+
 
  async addPatient(req: Request, res: Response, next: NextFunction) {
   try {

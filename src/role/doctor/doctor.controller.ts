@@ -65,22 +65,34 @@ async addDoctor(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-  async loginDoctor(req: Request, res: Response) {
+async loginDoctor(req: Request, res: Response, next: NextFunction) {
+  try {
     const { email, password } = req.body as { email?: string; password?: string };
-    if (!email || !password) return res.status(400).json({ message: 'Email y password requeridos' });
+
+    if (!email || !password) {
+      throw new HttpError(400, 'Email y password requeridos', 'MISSING_CREDENTIALS');
+    }
 
     const all = await this.repo.findAll();
     const user = (all || []).find((d: any) => d?.email === email);
-    if (!user) return res.status(401).json({ message: 'Credenciales inválidas' });
+    if (!user) {
+      throw new HttpError(401, 'Credenciales inválidas', 'INVALID_CREDENTIALS');
+    }
 
     const hashed = (user as any).password;
     const match = hashed ? await bcrypt.compare(password, hashed) : false;
-    if (!match) return res.status(401).json({ message: 'Credenciales inválidas' });
+    if (!match) {
+      throw new HttpError(401, 'Credenciales inválidas', 'INVALID_CREDENTIALS');
+    }
 
     const result = { ...(user as any) };
     if (result.password) delete result.password;
-    return res.json({ user: result });
+
+    return res.status(200).json({ user: result });
+  } catch (err) {
+    return next(err);
   }
+}
 
   async updateDoctor(req: Request, res: Response, next: NextFunction) {
   try {
