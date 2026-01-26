@@ -3,6 +3,7 @@ export class Consultation {
     public patient_id: number,
     public medical_record?: string,
     public image?: string | null,
+    public consultation_at?: string, 
     public id?: number,
     public created_at?: string,
     public updated_at?: string,
@@ -23,10 +24,20 @@ export class Consultation {
         ? null
         : String(data.image);
 
+        const rawDate = data?.consultation_at ?? null;
+    let consultation_at: string | undefined = undefined;
+
+    if (rawDate) {
+      const d = new Date(rawDate);
+      if (Number.isNaN(d.getTime())) throw new Error('INVALID_CONSULTATION_DATE');
+      consultation_at = d.toISOString();
+    }
+    
     return new Consultation(
       patient_id,
       medical_record,
       image,
+      consultation_at,
       data?.id !== undefined ? Number(data.id) : undefined,
       data?.created_at ? String(data.created_at) : undefined,
       data?.updated_at ? String(data.updated_at) : undefined,

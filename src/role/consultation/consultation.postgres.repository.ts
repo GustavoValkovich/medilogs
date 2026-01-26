@@ -4,7 +4,8 @@ import { ConsultationRepository } from "./consultation.repository.interface.js";
 
 export class ConsultationPostgresRepository implements ConsultationRepository {
   async findAll(): Promise<Consultation[] | undefined> {
-    const res = await pool.query("SELECT * FROM consultations WHERE deleted_at IS NULL ORDER BY id ASC");
+    const res = await pool.query("SELECT * FROM consultations WHERE deleted_at IS NULL ORDER BY consultation_at DESC, id DESC"
+);
     return res.rows;
   }
 
@@ -14,27 +15,29 @@ export class ConsultationPostgresRepository implements ConsultationRepository {
   }
 
   async add(consultation: Consultation): Promise<Consultation | undefined> {
-    const { patient_id, medical_record, image } = consultation;
+    const { patient_id, medical_record, image, consultation_at } = consultation;
     const res = await pool.query(
-      `INSERT INTO consultations (patient_id, medical_record, image)
-       VALUES ($1, $2, $3)
+      `INSERT INTO consultations (patient_id, medical_record, image, consultation_at)
+       VALUES ($1, $2, $3, COALESCE($4, CURRENT_TIMESTAMP))
        RETURNING *`,
-      [patient_id, medical_record, image]
+      [patient_id, medical_record, image, consultation_at]
     );
     return res.rows[0];
   }
 
+
   async update(id: string, consultation: Consultation): Promise<Consultation | undefined> {
-    const { patient_id, medical_record, image } = consultation;
+    const { patient_id, medical_record, image, consultation_at } = consultation;
     const res = await pool.query(
       `UPDATE consultations
-       SET patient_id=$1, medical_record=$2, image=$3
-       WHERE id=$4 AND deleted_at IS NULL
+       SET patient_id=$1, medical_record=$2, image=$3, consultation_at=COALESCE($4, consultation_at)
+       WHERE id=$5 AND deleted_at IS NULL
        RETURNING *`,
-      [patient_id, medical_record, image, id]
+      [patient_id, medical_record, image, consultation_at, id]
     );
     return res.rows[0];
   }
+
 
   async partialUpdate(id: string, updates: Partial<Consultation>): Promise<Consultation | undefined> {
     const allowed = ['patient_id', 'medical_record', 'image', 'deleted_at'];
