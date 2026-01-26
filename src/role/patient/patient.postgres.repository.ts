@@ -5,10 +5,10 @@ import { PatientRepository } from "./patient.repository.interface.js";
 export class PatientPostgresRepository implements PatientRepository {
   async findAll(doctorId?: number): Promise<Patient[] | undefined> {
     if (doctorId !== undefined && doctorId !== null && !Number.isNaN(Number(doctorId))) {
-      const result = await pool.query("SELECT * FROM patients WHERE doctor_id = $1 AND deleted_at IS NULL ORDER BY id ASC", [doctorId]);
+      const result = await pool.query("SELECT * FROM patients WHERE doctor_id = $1 AND deleted_at IS NULL ORDER BY full_name ASC, id ASC", [doctorId]);
       return result.rows;
     }
-    const result = await pool.query("SELECT * FROM patients WHERE deleted_at IS NULL ORDER BY id ASC");
+    const result = await pool.query("SELECT * FROM patients WHERE deleted_at IS NULL ORDER BY full_name ASC, id ASC");
     return result.rows;
   }
 
