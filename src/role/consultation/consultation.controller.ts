@@ -1,5 +1,7 @@
 import { Consultation } from './consultation.entity.js';
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { HttpError } from '../../shared/http-error.js';
+
 
 export class ConsultationController {
   constructor(
@@ -16,100 +18,136 @@ export class ConsultationController {
     this.restoreConsultation = this.restoreConsultation.bind(this);
   }
 
-  async findAllConsultations(req: Request, res: Response) {
+  async findAllConsultations(req: Request, res: Response, next: NextFunction) {
+  try {
     const items = await this.repo.findAll();
-    return res.status(200).json(items || []);
+    return res.status(200).json(items ?? []);
+  } catch (err) {
+    return next(err);
+  }
   }
 
-  async findConsultationById(req: Request, res: Response) {
+  async findConsultationById(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
     const item = await this.repo.findOne(id);
-    if (!item) return res.status(404).json({ message: 'Consulta no encontrada' });
+
+    if (!item) throw new HttpError(404, 'Consulta no encontrada', 'CONSULTATION_NOT_FOUND');
+
     return res.status(200).json(item);
+  } catch (err) {
+    return next(err);
+  }
   }
 
-async addConsultation(req: Request, res: Response) {
+
+async addConsultation(req: Request, res: Response, next: NextFunction) {
   try {
     const entity = Consultation.create(req.body);
 
     const patient = await this.patientRepo.findOne(String(entity.patient_id));
-    if (!patient) return res.status(404).json({ message: 'Paciente no encontrado' });
+    if (!patient) throw new HttpError(404, 'Paciente no encontrado', 'PATIENT_NOT_FOUND');
 
     const created = await this.repo.add(entity);
-    if (!created) return res.status(500).json({ message: 'No se pudo crear la consulta' });
+    if (!created) throw new HttpError(500, 'No se pudo crear la consulta');
+
     return res.status(201).json(created);
-  } catch (err: any) {
-    const code = err?.message || String(err);
-    if (String(code).startsWith('INVALID_')) {
-      return res.status(400).json({ message: 'Datos inválidos', code });
-    }
-    return res.status(500).json({ message: 'Error interno al crear la consulta' });
+  } catch (err) {
+    return next(err);
   }
 }
 
 
- async updateConsultation(req: Request, res: Response) {
+
+ async updateConsultation(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
     const entity = Consultation.create(req.body);
 
     const existing = await this.repo.findOne(id);
-    if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
+    if (!existing) throw new HttpError(404, 'Consulta no encontrada', 'CONSULTATION_NOT_FOUND');
 
     const updated = await this.repo.update(id, entity);
-    if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o no actualizada' });
+    if (!updated) throw new HttpError(404, 'Consulta no encontrada o no actualizada', 'CONSULTATION_NOT_UPDATED');
+
     return res.status(200).json(updated);
-  } catch (err: any) {
-    const code = err?.message || String(err);
-    if (String(code).startsWith('INVALID_')) {
-      return res.status(400).json({ message: 'Datos inválidos', code });
-    }
-    return res.status(500).json({ message: 'Error interno al actualizar la consulta' });
+  } catch (err) {
+    return next(err);
   }
 }
 
 
-  async partialUpdateConsultation(req: Request, res: Response) {
+
+  async partialUpdateConsultation(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
-    const updates = req.body;
 
     const existing = await this.repo.findOne(id);
-    if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
+    if (!existing) throw new HttpError(404, 'Consulta no encontrada', 'CONSULTATION_NOT_FOUND');
 
-    const updated = await this.repo.partialUpdate(id, updates);
-    if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o no actualizada' });
+    
+    if (req.body?.consultation_at) {
+      const d = new Date(req.body.consultation_at);
+      if (Number.isNaN(d.getTime())) throw new HttpError(400, 'Fecha/hora inválida', 'INVALID_CONSULTATION_DATE');
+      req.body.consultation_at = d.toISOString();
+    }
+
+    const updated = await this.repo.partialUpdate(id, req.body);
+    if (!updated) throw new HttpError(404, 'Consulta no encontrada o no actualizada', 'CONSULTATION_NOT_UPDATED');
+
     return res.status(200).json(updated);
+  } catch (err) {
+    return next(err);
   }
+}
 
-  async deleteConsultation(req: Request, res: Response) {
+
+  async deleteConsultation(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
 
     const existing = await this.repo.findOne(id);
-    if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
+    if (!existing) throw new HttpError(404, 'Consulta no encontrada', 'CONSULTATION_NOT_FOUND');
 
     const ok = await this.repo.delete(id);
-    if (!ok) return res.status(404).json({ message: 'Consulta no encontrada' });
-    return res.status(204).send();
-  }
+    if (!ok) throw new HttpError(404, 'Consulta no encontrada', 'CONSULTATION_NOT_DELETED');
 
-  async softDeleteConsultation(req: Request, res: Response) {
+    return res.status(204).send();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+
+  async softDeleteConsultation(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
-    const { deleted_at } = req.body || {};
 
     const existing = await this.repo.findOne(id);
-    if (!existing) return res.status(404).json({ message: 'Consulta no encontrada' });
+    if (!existing) throw new HttpError(404, 'Consulta no encontrada', 'CONSULTATION_NOT_FOUND');
 
-    const updated = await this.repo.softDelete(id, deleted_at);
-    if (!updated) return res.status(404).json({ message: 'Consulta no encontrada o ya eliminada' });
-    return res.status(200).json(updated);
+    const deleted = await this.repo.softDelete(id);
+    if (!deleted) throw new HttpError(404, 'Consulta no encontrada o no eliminada', 'CONSULTATION_NOT_DELETED');
+
+    return res.status(200).json(deleted);
+  } catch (err) {
+    return next(err);
   }
+}
 
-  async restoreConsultation(req: Request, res: Response) {
+
+  async restoreConsultation(req: Request, res: Response, next: NextFunction) {
+  try {
     const { id } = req.params;
+
     const restored = await this.repo.restore(id);
-    if (!restored) return res.status(404).json({ message: 'Consulta no encontrada o no eliminada' });
+    if (!restored) throw new HttpError(404, 'Consulta no encontrada o no restaurada', 'CONSULTATION_NOT_RESTORED');
+
     return res.status(200).json(restored);
+  } catch (err) {
+    return next(err);
   }
+}
 }
 
 export default ConsultationController;
