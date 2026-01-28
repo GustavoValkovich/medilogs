@@ -25,13 +25,20 @@ export class Consultation {
         : String(data.image);
 
         const rawDate = data?.consultation_at ?? null;
-    let consultation_at: string | undefined = undefined;
+let consultation_at: string | undefined = undefined;
 
-    if (rawDate) {
-      const d = new Date(rawDate);
-      if (Number.isNaN(d.getTime())) throw new Error('INVALID_CONSULTATION_DATE');
-      consultation_at = d.toISOString();
-    }
+if (rawDate) {
+  const d = new Date(rawDate);
+  if (Number.isNaN(d.getTime())) throw new Error('INVALID_CONSULTATION_DATE');
+
+  const now = new Date();
+  if (d.getTime() > now.getTime()) {
+    throw new Error('CONSULTATION_DATE_IN_FUTURE');
+  }
+
+  consultation_at = d.toISOString();
+}
+
     
     return new Consultation(
       patient_id,
