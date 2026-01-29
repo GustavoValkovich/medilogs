@@ -39,7 +39,7 @@ export class PatientController {
     return res.status(200).json(items ?? []);
   }
 
-  async findPatientById(req: Request, res: Response, next: NextFunction) {
+  async findPatientById(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
 
@@ -68,7 +68,7 @@ export class PatientController {
 }
 
 
- async addPatient(req: Request, res: Response, next: NextFunction) {
+ async addPatient(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const entity = Patient.create(req.body);
 
@@ -81,7 +81,7 @@ export class PatientController {
   }
 }
 
-async updatePatient(req: Request, res: Response, next: NextFunction) {
+async updatePatient(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const entity = Patient.create(req.body);
@@ -95,7 +95,7 @@ async updatePatient(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-  async partialUpdatePatient(req: Request, res: Response, next: NextFunction) {
+  async partialUpdatePatient(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const updates = (req.body ?? {}) as Record<string, any>;
@@ -132,7 +132,7 @@ async updatePatient(req: Request, res: Response, next: NextFunction) {
 }
 
 
-  async deletePatient(req: Request, res: Response, next: NextFunction) {
+  async deletePatient(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const ok = await this.repo.delete(id);
@@ -147,7 +147,7 @@ async updatePatient(req: Request, res: Response, next: NextFunction) {
   }
 }
 
- async softDeletePatient(req: Request, res: Response, next: NextFunction) {
+ async softDeletePatient(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const { deleted_at } = req.body as { deleted_at?: string };
@@ -164,7 +164,7 @@ async updatePatient(req: Request, res: Response, next: NextFunction) {
 }
 
 
-  async restorePatient(req: Request, res: Response, next: NextFunction) {
+  async restorePatient(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
 

@@ -34,7 +34,7 @@ describe('DoctorController', () => {
       license_number: 'ABC123',
       password: 'pass1234',
     };
-
+  
     req.body = nuevo;
 
     const creado: any = {
@@ -56,4 +56,23 @@ describe('DoctorController', () => {
       expect.not.objectContaining({ password: expect.anything() })
     );
   });
+
+   it('addDoctor si falla repo.add llama next(err)', async () => {
+    const next = jest.fn();
+
+    req.body = {
+      first_name: 'Dr.',
+      last_name: 'Error',
+      specialty: 'Clinica',
+      license_number: 'ERR123',
+      password: '1234',
+    };
+
+    (repo.add as jest.Mock).mockRejectedValue(new Error('boom'));
+
+    await controller.addDoctor(req, res, next);
+
+    expect(next).toHaveBeenCalled();
+  });
+  
 });

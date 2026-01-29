@@ -24,7 +24,7 @@ export class DoctorController {
     return res.status(200).json(safe);
   }
 
-  async findDoctorById(req: Request, res: Response, next: NextFunction) {
+  async findDoctorById(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const found = await this.repo.findOne(id);
@@ -43,7 +43,7 @@ export class DoctorController {
 }
 
 
-  async addDoctor(req: Request, res: Response, next: NextFunction) {
+  async addDoctor(req: Request, res: Response, next: NextFunction = () => undefined) {
     try {
     const data = Doctor.create(req.body);
 
@@ -63,7 +63,7 @@ export class DoctorController {
 }
 
 
-async loginDoctor(req: Request, res: Response, next: NextFunction) {
+async loginDoctor(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { email, password } = req.body as { email?: string; password?: string };
 
@@ -92,7 +92,7 @@ async loginDoctor(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-  async updateDoctor(req: Request, res: Response, next: NextFunction) {
+  async updateDoctor(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const data = Doctor.create(req.body);
@@ -114,7 +114,7 @@ async loginDoctor(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-  async partialUpdateDoctor(req: Request, res: Response, next: NextFunction) {
+  async partialUpdateDoctor(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const updates = req.body as Partial<Doctor>;
@@ -148,7 +148,7 @@ async loginDoctor(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-  async deleteDoctor(req: Request, res: Response, next: NextFunction) {
+  async deleteDoctor(req: Request, res: Response, next: NextFunction = () => undefined) {
   try {
     const { id } = req.params;
     const deleted = await this.repo.delete(id);

@@ -51,4 +51,17 @@ describe('PatientController', () => {
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith(creado);
   });
+
+   it('addPatient si falla repo.add llama next(err)', async () => {
+    const next = jest.fn();
+
+    req.body = { full_name: 'Juan' };
+
+    (repo.add as jest.Mock).mockRejectedValue(new Error('boom'));
+
+    await controller.addPatient(req, res, next);
+
+    expect(next).toHaveBeenCalled();
+  });
+
 });
